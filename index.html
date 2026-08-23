@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a3c5e">
+<title>SIA</title>
+<style>
+  :root{
+    --navy:#1a3c5e; --green:#2d6a4f; --amber:#b45309; --red:#b0332a;
+    --bg:#f4f6f8; --card:#ffffff; --line:#dde4ea; --txt:#22262a; --mut:#6b7580;
+    --tap:48px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;}
+  body{padding-bottom:calc(70px + env(safe-area-inset-bottom));}
+  header{background:var(--navy);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:5;
+    display:flex;justify-content:space-between;align-items:center;}
+  header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:1px;}
+  header .date-nav{display:flex;align-items:center;gap:6px;}
+  header button{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:8px;
+    min-width:36px;height:36px;font-size:16px;}
+  header .dlabel{font-size:13px;min-width:86px;text-align:center;}
+  main{padding:12px;max-width:640px;margin:0 auto;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;}
+  .card h2{font-size:15px;margin:0 0 10px;color:var(--navy);}
+  .card h3{font-size:13.5px;margin:12px 0 6px;color:var(--green);}
+  .muted{color:var(--mut);font-size:13px;}
+  .small{font-size:12.5px;}
+  nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
+    display:flex;z-index:10;padding-bottom:env(safe-area-inset-bottom);}
+  nav button{flex:1;background:none;border:0;padding:8px 2px 6px;font-size:11px;color:var(--mut);min-height:56px;}
+  nav button .ic{display:block;font-size:20px;margin-bottom:2px;}
+  nav button.active{color:var(--navy);font-weight:700;}
+  .tab{display:none;} .tab.active{display:block;}
+  .chk{display:flex;align-items:flex-start;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);min-height:var(--tap);}
+  .chk:last-child{border-bottom:0;}
+  .chk input[type=checkbox]{width:26px;height:26px;margin-top:2px;accent-color:var(--green);flex-shrink:0;}
+  .chk label{flex:1;line-height:1.35;}
+  .chk.done label{color:var(--mut);text-decoration:line-through;}
+  .chk .sub{display:block;font-size:12.5px;color:var(--mut);text-decoration:none !important;}
+  .chk a{color:#1a5eb8;text-decoration:none;font-weight:600;}
+  .daytype{display:flex;gap:8px;margin-bottom:12px;}
+  .daytype button{flex:1;padding:10px 4px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:13px;color:var(--mut);}
+  .daytype button.sel{border-color:var(--navy);background:var(--navy);color:#fff;font-weight:700;}
+  .progressbar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:6px 0 2px;}
+  .progressbar div{height:100%;background:var(--green);transition:width .3s;}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}
+  .btn{padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:14px;color:var(--txt);min-height:var(--tap);}
+  .btn.primary{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:600;}
+  .btn.green{background:var(--green);border-color:var(--green);color:#fff;font-weight:600;}
+  .btn.warn{background:#fff;border-color:var(--red);color:var(--red);}
+  .btn.sel{background:var(--amber);border-color:var(--amber);color:#fff;font-weight:700;}
+  .btn:active{opacity:.7;}
+  .bigstat{font-size:24px;font-weight:800;color:var(--navy);}
+  .statrow{display:flex;gap:8px;text-align:center;}
+  .statrow>div{flex:1;background:#f0f4f8;border-radius:10px;padding:10px 4px;}
+  .statrow .lab{font-size:11px;color:var(--mut);}
+  input[type=number],input[type=text],textarea,select{
+    width:100%;padding:11px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;background:#fff;color:var(--txt);}
+  textarea{min-height:64px;resize:vertical;}
+  .inline{display:flex;gap:8px;align-items:center;}
+  .inline input,.inline select{flex:1;min-width:0;}
+  .loglist{margin-top:10px;}
+  .logitem{display:flex;justify-content:space-between;align-items:center;padding:7px 2px;border-bottom:1px dashed var(--line);font-size:13.5px;}
+  .logitem .del{color:var(--red);background:none;border:0;font-size:16px;padding:4px 8px;}
+  .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11.5px;font-weight:700;}
+  .pill.leak{background:#fde8e6;color:var(--red);}
+  .pill.trig{background:#fdf1de;color:var(--amber);}
+  .pill.med{background:#e8ecf7;color:#31448a;}
+  .pill.u0{background:#e7f2ec;color:var(--green);} .pill.u1{background:#eef2e0;color:#5c6e1f;}
+  .pill.u2{background:#fdf1de;color:var(--amber);} .pill.u3{background:#fde8e6;color:var(--red);}
+  .chart{display:flex;align-items:flex-end;gap:3px;height:90px;margin:8px 0 2px;}
+  .chart .bar{flex:1;background:var(--navy);border-radius:3px 3px 0 0;min-height:2px;position:relative;}
+  .chart .bar.today{background:var(--amber);}
+  .chartlabels{display:flex;gap:3px;font-size:9px;color:var(--mut);}
+  .chartlabels span{flex:1;text-align:center;overflow:hidden;}
+  details{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;}
+  details summary{padding:12px;font-weight:600;font-size:14px;color:var(--navy);cursor:pointer;min-height:var(--tap);display:flex;align-items:center;}
+  details .body{padding:0 14px 12px;font-size:14px;line-height:1.5;}
+  details .body li{margin:4px 0;}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;
+    padding:10px 18px;border-radius:20px;font-size:14px;z-index:50;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center;}
+  .toast.show{opacity:1;}
+  .warnbox{background:#fdf6e3;border:1px solid #ead9a8;border-radius:10px;padding:10px 12px;font-size:13px;color:#6b5900;margin:8px 0;}
+  .hintbox{background:#e7f2ec;border:1px solid #bcd9c9;border-radius:10px;padding:8px 12px;font-size:13px;color:#1d4d38;margin:8px 0;}
+  .unclench-svg{display:block;margin:6px auto;}
+  .benchgrid{display:grid;grid-template-columns:1fr 84px;gap:6px 8px;align-items:center;margin-bottom:4px;}
+  .benchgrid label{font-size:13px;line-height:1.25;}
+  .benchgrid input{padding:8px;font-size:15px;}
+  .optlabel{font-size:12px;color:var(--mut);margin:8px 0 2px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>SIA</h1>
+  <div class="date-nav">
+    <button onclick="shiftDay(-1)">‹</button>
+    <span class="dlabel" id="dlabel"></span>
+    <button onclick="shiftDay(1)" id="fwdBtn">›</button>
+  </div>
+</header>
+
+<main>
+<!-- ============ CHECK ============ -->
+<div class="tab active" id="tab-check">
+  <div class="card">
+    <h2>Day type</h2>
+    <div class="daytype" id="daytypeRow"></div>
+    <div class="muted small" id="daytypeHint"></div>
+  </div>
+  <div class="card">
+    <h2>Checklist <span class="muted small" id="chkCount"></span></h2>
+    <div class="progressbar"><div id="chkProg" style="width:0%"></div></div>
+    <div id="checklist"></div>
+  </div>
+  <div class="card">
+    <h2>Steps</h2>
+    <div class="inline">
+      <input type="number" id="stepsInput" inputmode="numeric" placeholder="Steps from Garmin Connect">
+      <button class="btn primary" onclick="saveSteps()">Save</button>
+    </div>
+    <div class="muted small" style="margin-top:6px">Target: <b id="stepTargetLbl"></b></div>
+    <div class="hintbox" id="stepHint" style="display:none"></div>
+  </div>
+  <div class="card">
+    <h2>One-off tasks (this phase)</h2>
+    <div id="oneoffs"></div>
+  </div>
+</div>
+
+<!-- ============ INGESTED ============ -->
+<div class="tab" id="tab-ingest">
+  <div class="card">
+    <h2>Fluids in</h2>
+    <div class="statrow">
+      <div><div class="bigstat" id="waterTotal">0</div><div class="lab">ml today</div></div>
+      <div><div class="bigstat" id="waterTarget2">–</div><div class="lab">target ml</div></div>
+      <div><div class="bigstat" id="caffTotal">0</div><div class="lab">caffeine shots</div></div>
+    </div>
+    <div class="btnrow" id="quickDrinks"></div>
+    <h3>All drinks</h3>
+    <div class="inline" style="margin-bottom:6px">
+      <select id="drinkSelect" onchange="drinkSelected()"></select>
+    </div>
+    <div class="inline" style="margin-bottom:6px">
+      <input type="number" id="drinkMl" inputmode="numeric" placeholder="ml">
+      <input type="text" id="drinkTime" placeholder="Time (blank = now)">
+    </div>
+    <button class="btn primary" style="width:100%" onclick="addSelectedDrink()">Add</button>
+    <p class="muted small" style="margin:6px 0 0">The time box also applies to the quick buttons above — fill it first if logging an earlier drink.</p>
+    <details style="margin-top:10px">
+      <summary>➕ Add a new drink to the list</summary>
+      <div class="body">
+        <div class="inline" style="margin-bottom:6px">
+          <input type="text" id="npName" placeholder="Name (e.g. Flat white 2-shot)">
+        </div>
+        <div class="inline" style="margin-bottom:6px">
+          <input type="number" id="npMl" inputmode="numeric" placeholder="Usual ml">
+          <input type="number" id="npCaff" inputmode="decimal" step="0.5" placeholder="Caffeine shots">
+        </div>
+        <button class="btn primary" style="width:100%" onclick="addPreset()">Save to drink list</button>
+        <p class="muted small">Caffeine shots: espresso shot = 1, tea ≈ 0.5, none = 0.</p>
+      </div>
+    </details>
+    <div class="loglist" id="drinkList"></div>
+  </div>
+  <div class="card">
+    <h2>Medication &amp; supplements</h2>
+    <div class="inline" style="margin-bottom:6px">
+      <select id="medSelect" onchange="medSelected()"></select>
+    </div>
+    <input type="text" id="medOther" placeholder="Name of the other medication/supplement" style="display:none;margin-bottom:6px">
+    <div class="inline" style="margin-bottom:6px">
+      <input type="text" id="medDose" placeholder="Dose (e.g. 10mg, 1 tsp, 2 caps)">
+      <input type="text" id="medTime" placeholder="Time (blank = now)">
+    </div>
+    <button class="btn green" style="width:100%" onclick="saveMed()">Log it</button>
+    <p class="muted small" style="margin-bottom:0">Timing matters — Ritalin, Cialis and psyllium doses all interact with your symptoms. Log the real time if entering later.</p>
+    <div class="loglist" id="medList"></div>
+  </div>
+  <div class="card">
+    <h2>Food diary <span class="muted small">(optional — full days only count)</span></h2>
+    <textarea id="foodText" placeholder="Rough description, e.g. 2 eggs on toast, coffee already logged above"></textarea>
+    <div class="inline" style="margin:6px 0">
+      <input type="text" id="foodTime" placeholder="Time (blank = now, e.g. 13:30)">
+      <button class="btn primary" onclick="saveFood()">Add</button>
+    </div>
+    <div class="loglist" id="foodList"></div>
+  </div>
+</div>
+
+<!-- ============ BODY ============ -->
+<div class="tab" id="tab-body">
+  <div class="card">
+    <h2>Wees</h2>
+    <div class="statrow">
+      <div><div class="bigstat" id="voidCount">0</div><div class="lab">wees today</div></div>
+      <div><div class="bigstat" id="leakCount">0</div><div class="lab">leaks today</div></div>
+    </div>
+    <h3>How strong was the urge?</h3>
+    <div class="btnrow" id="urgencyRow">
+      <button class="btn" data-u="0" onclick="pickUrgency(0)">0 calm</button>
+      <button class="btn" data-u="1" onclick="pickUrgency(1)">1 mild</button>
+      <button class="btn" data-u="2" onclick="pickUrgency(2)">2 strong</button>
+      <button class="btn" data-u="3" onclick="pickUrgency(3)">3 desperate</button>
+    </div>
+    <div class="optlabel">How long did the urge last? (optional)</div>
+    <div class="btnrow" id="durRow">
+      <button class="btn" data-d="brief" onclick="pickDur('brief')">&lt;1 min</button>
+      <button class="btn" data-d="minutes" onclick="pickDur('minutes')">1–10 min</button>
+      <button class="btn" data-d="long" onclick="pickDur('long')">10+ min</button>
+    </div>
+    <div class="optlabel">Pattern? (optional)</div>
+    <div class="btnrow" id="patRow">
+      <button class="btn" data-p="constant" onclick="pickPat('constant')">Constant</button>
+      <button class="btn" data-p="onoff" onclick="pickPat('onoff')">On &amp; off</button>
+    </div>
+    <div class="inline" style="margin-bottom:8px">
+      <input type="number" id="voidMl" inputmode="numeric" placeholder="ml (jug at home — optional)">
+    </div>
+    <input type="text" id="voidNote" placeholder="More context? (optional)" style="margin-bottom:8px">
+    <button class="btn green" style="width:100%" onclick="saveVoid()">Save wee</button>
+    <p class="muted small">ml only when you're home with the jug — aim for 3+ measured days in a row, roughly monthly. More is fine.</p>
+    <div class="loglist" id="voidList"></div>
+  </div>
+  <div class="card">
+    <h2>Leaks</h2>
+    <p class="muted small">A leak is its own event — log it here whether or not a wee followed.</p>
+    <div class="btnrow" id="leakSizeRow">
+      <button class="btn" data-s="drops" onclick="pickLeakSize('drops')">💧 Drops</button>
+      <button class="btn" data-s="spurt" onclick="pickLeakSize('spurt')">💦 Spurt</button>
+      <button class="btn" data-s="wet" onclick="pickLeakSize('wet')">🌊 Properly wet</button>
+    </div>
+    <input type="text" id="leakNote" placeholder="What were you doing? (optional)" style="margin-bottom:8px">
+    <button class="btn green" style="width:100%" onclick="saveLeak()">Save leak</button>
+    <div class="loglist" id="leakList"></div>
+  </div>
+  <div class="card">
+    <h2>Bowel movement</h2>
+    <h3>Bristol type</h3>
+    <div class="btnrow" id="bristolRow">
+      <button class="btn" data-b="1" onclick="pickBristol(1)">1</button>
+      <button class="btn" data-b="2" onclick="pickBristol(2)">2</button>
+      <button class="btn" data-b="3" onclick="pickBristol(3)">3</button>
+      <button class="btn" data-b="4" onclick="pickBristol(4)">4 ✓</button>
+      <button class="btn" data-b="5" onclick="pickBristol(5)">5</button>
+      <button class="btn" data-b="6" onclick="pickBristol(6)">6</button>
+      <button class="btn" data-b="7" onclick="pickBristol(7)">7</button>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="strainBtn" onclick="toggleStrain()">Strained? No</button>
+      <button class="btn" id="assistBtn" onclick="toggleAssist()">Manual assist? No</button>
+    </div>
+    <input type="text" id="bowelNote" placeholder="More context? (optional)" style="margin-bottom:8px">
+    <button class="btn green" style="width:100%" onclick="saveBowel()">Save bowel movement</button>
+    <div class="loglist" id="bowelList"></div>
+  </div>
+  <div class="card">
+    <h2>Note Jotting</h2>
+    <p class="muted small">Anything you notice: urgency causes, wins, sleep, pain. Tag trigger positions so Claude knows to ask for the photo.</p>
+    <textarea id="jotText" placeholder="e.g. 2pm — leaning over kitchen bench, urgency hit within 30 sec"></textarea>
+    <div class="btnrow">
+      <button class="btn" id="trigBtn" onclick="toggleTrigger()">Trigger position? No</button>
+      <button class="btn primary" style="flex:1" onclick="saveJot()">Save note</button>
+    </div>
+    <div class="loglist" id="jotList"></div>
+  </div>
+  <div class="card">
+    <h2>Benchmarks <span class="muted small">(every 2–3 weeks, filmed)</span></h2>
+    <p class="muted small">Set up the tripods (same spots each time — side + front), film the whole battery, then enter numbers. Quality beats numbers: no breath-holding, no butt-gripping, stop anything painful.</p>
+    <div class="benchgrid" id="benchGrid"></div>
+    <button class="btn primary" style="width:100%;margin-top:6px" onclick="saveBench()">Save benchmark session</button>
+    <div class="loglist" id="benchList"></div>
+  </div>
+  <div class="card">
+    <h2>Monthly measurements</h2>
+    <h3>Core</h3>
+    <div class="inline" style="margin-bottom:6px"><input type="number" step="0.1" id="mWeight" placeholder="Weight kg"><input type="number" step="0.5" id="mWaist" placeholder="Waist cm"></div>
+    <div class="inline" style="margin-bottom:6px"><input type="number" step="0.5" id="mHips" placeholder="Hips cm"><input type="number" step="0.5" id="mGlutes" placeholder="Glutes cm (widest)"></div>
+    <div class="inline" style="margin-bottom:6px"><input type="number" step="0.5" id="mThighL" placeholder="L thigh cm"><input type="number" step="0.5" id="mThighR" placeholder="R thigh cm"></div>
+    <h3>Nice to have (skip freely)</h3>
+    <div class="inline" style="margin-bottom:6px"><input type="number" id="mRHR" inputmode="numeric" placeholder="Resting HR (Garmin)"><input type="number" step="0.5" id="mNeck" placeholder="Neck cm"></div>
+    <div class="inline" style="margin-bottom:6px"><input type="number" step="0.5" id="mChest" placeholder="Chest cm"><input type="text" id="mNote" placeholder="Note"></div>
+    <button class="btn primary" style="width:100%" onclick="saveMeasure()">Save measurements</button>
+    <p class="muted small" style="margin-bottom:0">Thighs: 15cm above kneecap. Also take the monthly side photo — send to Claude.</p>
+    <div class="loglist" id="measureList"></div>
+  </div>
+</div>
+
+<!-- ============ TRENDS ============ -->
+<div class="tab" id="tab-trends">
+  <div class="card">
+    <h2>Streak</h2>
+    <div class="statrow">
+      <div><div class="bigstat" id="streakNow">0</div><div class="lab">current (core done)</div></div>
+      <div><div class="bigstat" id="streakBest">0</div><div class="lab">best</div></div>
+    </div>
+    <p class="muted small" style="margin-bottom:0">"Core done" = down-training + evening log ticked (event days: just the log). Never miss twice.</p>
+  </div>
+  <div class="card"><h2>Urgency — wees at urge 2-3 per day</h2><div class="chart" id="chUrg"></div><div class="chartlabels" id="chUrgL"></div></div>
+  <div class="card"><h2>Leaks per day</h2><div class="chart" id="chLeak"></div><div class="chartlabels" id="chLeakL"></div></div>
+  <div class="card"><h2>Steps</h2><div class="chart" id="chSteps"></div><div class="chartlabels" id="chStepsL"></div></div>
+  <div class="card"><h2>Water (ml)</h2><div class="chart" id="chWater"></div><div class="chartlabels" id="chWaterL"></div></div>
+  <div class="card"><h2>Caffeine shots per day</h2><div class="chart" id="chCaff"></div><div class="chartlabels" id="chCaffL"></div></div>
+  <div class="card"><h2>Checklist completion %</h2><div class="chart" id="chChk"></div><div class="chartlabels" id="chChkL"></div></div>
+</div>
+
+<!-- ============ MORE ============ -->
+<div class="tab" id="tab-more">
+  <div class="card">
+    <h2>Reference cards</h2>
+    <details>
+      <summary>🧘 The hourly unclench (10 seconds)</summary>
+      <div class="body">
+        <svg class="unclench-svg" width="120" height="170" viewBox="0 0 120 170">
+          <circle cx="60" cy="25" r="16" fill="none" stroke="#1a3c5e" stroke-width="3"/>
+          <line x1="60" y1="41" x2="60" y2="105" stroke="#1a3c5e" stroke-width="3"/>
+          <line x1="60" y1="60" x2="35" y2="90" stroke="#1a3c5e" stroke-width="3"/>
+          <line x1="60" y1="60" x2="85" y2="90" stroke="#1a3c5e" stroke-width="3"/>
+          <line x1="60" y1="105" x2="42" y2="150" stroke="#1a3c5e" stroke-width="3"/>
+          <line x1="60" y1="105" x2="78" y2="150" stroke="#1a3c5e" stroke-width="3"/>
+          <circle cx="60" cy="32" r="7" fill="#b0332a" opacity=".75"/>
+          <circle cx="60" cy="80" r="7" fill="#b45309" opacity=".75"/>
+          <circle cx="60" cy="103" r="7" fill="#2d6a4f" opacity=".75"/>
+          <text x="76" y="36" font-size="10" fill="#b0332a">jaw</text>
+          <text x="76" y="84" font-size="10" fill="#b45309">belly</text>
+          <text x="76" y="112" font-size="10" fill="#2d6a4f">butt</text>
+        </svg>
+        <ol>
+          <li>Long, slow exhale.</li>
+          <li>Scan the three zones: <b>jaw → belly → butt</b>.</li>
+          <li>Let each one sag, like putting down a heavy bag.</li>
+        </ol>
+        <p class="muted small">Can't tell if your butt is clenched? Squeeze it deliberately for 2 sec, then release — the "after" feeling is the target. Trigger: your Garmin Move Alert buzz (or an hourly iPhone Shortcuts notification).</p>
+      </div>
+    </details>
+    <details>
+      <summary>🌊 The urge wave</summary>
+      <div class="body">
+        <ol>
+          <li>Stop moving. Stand or sit still.</li>
+          <li>Slow exhale; light lower-core lift (your "lift the sack" cue).</li>
+          <li>Let the wave crest and fall — 30–60 seconds. It will fall.</li>
+          <li>Still need to go? Walk calmly. No sprinting, no hard clenching.</li>
+        </ol>
+        <p class="muted small">No "just in case" wees — except before driving or filming (practical pass).</p>
+      </div>
+    </details>
+    <details>
+      <summary>🚽 Toilet position + no straining</summary>
+      <div class="body">
+        <ul>
+          <li>Squatty potty in place, knees above hips, lean forward, forearms on thighs.</li>
+          <li><b>Never strain.</b> Slow exhale through pursed lips, or hum. Let the floor open.</li>
+          <li>Nothing in 5 min → leave, retry after next meal or a walk.</li>
+          <li>Never ignore the cue — when it calls, go. Best window: 20–30 min after breakfast + coffee.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>🥄 Fibre dosing</summary>
+      <div class="body">
+        <ul>
+          <li><b>Psyllium powder (home):</b> start 1 tsp (~5g) once daily in a FULL glass of water (250ml+), drink immediately, chase with more water. After 1 week, if stools still sludgy → 1 tsp twice daily.</li>
+          <li><b>The water is not optional</b> — psyllium without fluid makes constipation worse.</li>
+          <li><b>Capsules (out):</b> follow packet equivalent of ~5g/dose, same water rule.</li>
+          <li><b>Kiwifruit:</b> 1–2 green kiwis daily, breakfast or dessert.</li>
+          <li class="muted small">Confirm dosing with your pharmacist/GP. Log every dose in Ingested → Medication &amp; supplements.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>🛏️ Down-training videos (10 min)</summary>
+      <div class="body">
+        <ul>
+          <li><a href="https://www.youtube.com/watch?v=5iwvfP4LIaQ" target="_blank">Hypertonic pelvic floor stretching &amp; self-massage</a></li>
+          <li><a href="https://www.youtube.com/watch?v=hcecJr_VTzc" target="_blank">4 techniques to relax a hypertonic pelvic floor</a></li>
+          <li class="muted small">Rotate them. Freestyle version: constructive rest breathing → knees-wide child's pose → happy baby. Inhale = ribs wide AND floor drops. Exhale = do nothing.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>🎯 Benchmark battery — how to run it</summary>
+      <div class="body">
+        <ul>
+          <li>Every 2–3 weeks. Same time of day, same clothes, tripods on the same marks (side + front angle).</li>
+          <li>Warm up 5 min (easy walk) first. It's a test, not a workout — stop anything painful.</li>
+          <li>Timed holds end when form breaks (hips drop, breath held, butt grips).</li>
+          <li>Left ankle: split-squat stance is your lunge; wobblier left balance is expected, not failure.</li>
+          <li>Film everything, enter the numbers here, send Claude the footage links/files for form review.</li>
+        </ul>
+      </div>
+    </details>
+    <details>
+      <summary>📏 The rules</summary>
+      <div class="body">
+        <ul>
+          <li><b>Minimum day:</b> 10-min video + one 10-min walk + log. Done = streak intact.</li>
+          <li><b>Never miss twice.</b> One zero day is life. Two in a row triggers a minimum day, no negotiation.</li>
+          <li><b>Event/wedding days are zero days.</b> Guilt is banned.</li>
+          <li><b>Day type = capacity, not location.</b> Editing at home = Normal. Minimum is the escape hatch for genuinely depleted days.</li>
+          <li>Missed Pilates sessions roll forward. 3/week, whichever days they land.</li>
+          <li>Catch yourself butt-gripping or breath-holding in a class → stop, reset, go lighter.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+  <div class="card">
+    <h2>Weekly export → paste to Claude</h2>
+    <p class="muted small">Sunday nights: ① Copy summary → paste into Claude chat. ② Copy full backup → paste into your Notes app (that's your backup). Data lives only on this device.</p>
+    <div class="btnrow">
+      <button class="btn primary" onclick="exportText()">📋 Copy summary</button>
+      <button class="btn" onclick="exportJSON()">💾 Copy full backup</button>
+    </div>
+    <textarea id="exportBox" placeholder="Export appears here — copy and paste into Claude chat"></textarea>
+  </div>
+  <div class="card">
+    <h2>Import backup</h2>
+    <p class="muted small">Only for disasters or syncing devices: paste a full backup, hit Import.</p>
+    <div class="inline">
+      <input type="text" id="importBox" placeholder="Paste backup JSON here">
+      <button class="btn" onclick="importJSON()">Import</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Settings</h2>
+    <div class="inline" style="margin-bottom:8px">
+      <label class="small" style="flex:1">Step target</label>
+      <input type="number" id="setSteps" style="flex:1" inputmode="numeric">
+    </div>
+    <div class="inline" style="margin-bottom:8px">
+      <label class="small" style="flex:1">Water target (ml)</label>
+      <input type="number" id="setWater" style="flex:1" inputmode="numeric">
+    </div>
+    <button class="btn primary" onclick="saveSettings()">Save settings</button>
+    <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+    <button class="btn warn" onclick="wipeAll()">Erase all data</button>
+  </div>
+</div>
+</main>
+
+<nav>
+  <button id="nav-check" class="active" onclick="showTab('check')"><span class="ic">✅</span>Check</button>
+  <button id="nav-ingest" onclick="showTab('ingest')"><span class="ic">🍽️</span>Ingested</button>
+  <button id="nav-body" onclick="showTab('body')"><span class="ic">🚻</span>Body</button>
+  <button id="nav-trends" onclick="showTab('trends')"><span class="ic">📈</span>Trends</button>
+  <button id="nav-more" onclick="showTab('more')"><span class="ic">📚</span>More</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+// ---------- storage ----------
+const KEY = "dt_data_v1";
+const DEFAULT_PRESETS = [
+  {name:"Water glass", ml:250, caff:0},
+  {name:"Water bottle", ml:600, caff:0},
+  {name:"Cappuccino 1-shot", ml:200, caff:1},
+  {name:"Cappuccino 2-shot", ml:220, caff:2},
+  {name:"Espresso shot", ml:30, caff:1},
+  {name:"Black coffee", ml:250, caff:1},
+  {name:"Tea", ml:250, caff:0.5},
+  {name:"Milk", ml:250, caff:0},
+  {name:"Fizzy / sparkling", ml:250, caff:0},
+  {name:"Red Bull", ml:250, caff:1},
+  {name:"Alcohol (1 std drink)", ml:300, caff:0}
+];
+const MEDS = ["Ritalin","Cialis","Zinc","Magnesium","Maca","Psyllium Husk Powder","Other"];
+let DB = load();
+function load(){
+  let db=null;
+  try { const raw = localStorage.getItem(KEY); if (raw) db = JSON.parse(raw); } catch(e){}
+  if(!db) db = { settings:{}, days:{}, measurements:[], oneoffs:{}, benchmarks:[] };
+  db.settings = Object.assign({stepTarget:4000, waterTarget:2250}, db.settings);
+  if(!db.settings.drinkPresets) db.settings.drinkPresets = DEFAULT_PRESETS.slice();
+  if(!db.benchmarks) db.benchmarks = [];
+  if(!db.measurements) db.measurements = [];
+  if(!db.oneoffs) db.oneoffs = {};
+  if(!db.days) db.days = {};
+  Object.keys(db.days).forEach(k=>{
+    const d=db.days[k];
+    if(!d.leaks) d.leaks=[];
+    if(d.voids) d.voids.forEach(v=>{ if(v.leak){ d.leaks.push({t:v.t,size:"spurt",note:"(migrated)"}); v.leak=false; } });
+    if(!d.notes) d.notes=[];
+    if(!d.bowel) d.bowel=[];
+    if(!d.drinks) d.drinks=[];
+    if(!d.voids) d.voids=[];
+    if(!d.food) d.food=[];
+    if(!d.meds) d.meds=[];
+  });
+  return db;
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){ toast("⚠️ Could not save"); } }
+
+// ---------- date handling ----------
+function dkey(d){ const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+let viewDate = new Date();
+function today(){ return dkey(new Date()); }
+function curKey(){ return dkey(viewDate); }
+function blankDay(){ return {dayType:"normal",checks:{},drinks:[],voids:[],leaks:[],bowel:[],notes:[],food:[],meds:[],steps:null}; }
+function day(){ const k=curKey();
+  if(!DB.days[k]) DB.days[k]=blankDay();
+  return DB.days[k]; }
+function shiftDay(n){
+  const d=new Date(viewDate); d.setDate(d.getDate()+n);
+  if(dkey(d) > today()) return;
+  viewDate=d; renderAll();
+}
+function fmtDate(k){
+  const [y,m,dd]=k.split("-").map(Number); const d=new Date(y,m-1,dd);
+  return d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+}
+function nowTime(){ return new Date().toTimeString().slice(0,5); }
+function entryTime(id){ const v=document.getElementById(id).value.trim(); return v||nowTime(); }
+
+// ---------- checklist definitions ----------
+const VIDEOS = '<a href="https://www.youtube.com/watch?v=5iwvfP4LIaQ" target="_blank">Video A</a> · <a href="https://www.youtube.com/watch?v=hcecJr_VTzc" target="_blank">Video B</a>';
+function itemsFor(k, type){
+  const [y,m,dd]=k.split("-").map(Number); const wd=new Date(y,m-1,dd).getDay();
+  if(type==="event") return [
+    {id:"dt", label:"Morning breathing — even 3 minutes", sub:"That's the whole assignment today"},
+    {id:"log", label:"Evening log (30 sec)", sub:"Day type + this checklist = done"}];
+  if(type==="minimum") return [
+    {id:"dt", label:"Down-training video (10 min)", sub:VIDEOS},
+    {id:"walk", label:"One 10-minute walk", sub:"Orthotics or Hokas on"},
+    {id:"log", label:"Evening log (30 sec)", sub:""}];
+  const items=[
+    {id:"dt", label:"Down-training video (10 min)", sub:VIDEOS},
+    {id:"walk", label:"Walk — hit step target", sub:"Split into 2 walks; dogs count; after meals is best"},
+    {id:"alarm", label:"Hourly unclench reminders running", sub:"Garmin Move Alert or Shortcuts — jaw · belly · butt"},
+    {id:"bowel", label:"Bowel protocol", sub:"Squatty potty, no strain, fibre — see reference cards"},
+    {id:"water", label:"Water target hit, max 1 fizzy", sub:"Check the Ingested tab total"},
+    {id:"audio", label:"No distracting audio", sub:"Music / podcasts / no background sounds / avoid headphones"}];
+  if(wd===2||wd===4||wd===6) items.push({id:"pilates", label:"Mat Pilates 20–30 min (Peloton)", sub:"Beginner level · butt-gripping or breath-holding → stop, reset, lighter"});
+  if(wd===1||wd===3||wd===5) items.push({id:"russell", label:"Russell's 3 exercises (10 min)", sub:"One-leg balance · split-squat stance (L) · deadlift squat"});
+  items.push({id:"log", label:"Evening log (30 sec)", sub:"Steps + wees + anything noticed"});
+  return items;
+}
+const ONEOFFS=[
+  {id:"alarmset", label:"Turn on Garmin Move Alert (or set hourly Shortcuts notification)"},
+  {id:"shopping", label:"Buy kiwifruit + psyllium (powder + capsules)"},
+  {id:"jug", label:"Get a cheap dedicated measuring jug (for measured wee days)"},
+  {id:"reformer", label:"Aldi reformer fit-test with a Melanie Lopez fundamentals video — report what fits"},
+  {id:"bench0", label:"Baseline benchmark session — film it, enter numbers in Body tab"},
+  {id:"russellbook", label:"Book Russell for ~week of 28 Sept (placeholder deadline)"},
+  {id:"gp", label:"Book GP — bring the list from Plan v2"},
+  {id:"deskphotos", label:"Send desk setup photos to Claude (tripod, side-on)"},
+  {id:"carphotos", label:"Send car driving position photos/video to Claude"}];
+
+// ---------- benchmarks ----------
+const BENCH=[
+  {id:"deepSquat", label:"1. Deep squat hold (sec, max 60)"},
+  {id:"slsOpenL", label:"2a. One-leg stand, eyes open — LEFT (sec, max 60)"},
+  {id:"slsOpenR", label:"2b. One-leg stand, eyes open — RIGHT (sec, max 60)"},
+  {id:"slsClosedL", label:"3a. One-leg stand, eyes closed — LEFT (sec, max 30)"},
+  {id:"slsClosedR", label:"3b. One-leg stand, eyes closed — RIGHT (sec, max 30)"},
+  {id:"bridgeHold", label:"4. Glute bridge hold (sec, max 60)"},
+  {id:"slBridgeL", label:"5a. Single-leg bridge reps — LEFT (max 15)"},
+  {id:"slBridgeR", label:"5b. Single-leg bridge reps — RIGHT (max 15)"},
+  {id:"sidePlankL", label:"6a. Side plank — LEFT (sec)"},
+  {id:"sidePlankR", label:"6b. Side plank — RIGHT (sec)"},
+  {id:"wallSit", label:"7. Wall sit (sec)"},
+  {id:"bssL", label:"8a. Bulgarian split squat reps — LEFT leg fwd (max 12)"},
+  {id:"bssR", label:"8b. Bulgarian split squat reps — RIGHT leg fwd (max 12)"},
+  {id:"sts30", label:"9. Sit-to-stands in 30 sec (no hands)"},
+  {id:"breaths", label:"10. Breaths per minute, seated calm"},
+  {id:"pfDrop", label:"11. Pelvic floor drop-on-command (self-rate 0–10)"},
+  {id:"happyBaby", label:"12. Happy baby comfort (self-rate 0–10)"}];
+
+// ---------- render: check ----------
+const DAYTYPES=[["normal","Normal"],["minimum","Minimum"],["event","Event day"]];
+const HINTS={
+  normal:"The default — including home editing days. Capacity, not location.",
+  minimum:"Escape hatch for genuinely depleted days (bad sleep, sick, late painting). Video + one walk + log = streak intact.",
+  event:"8–10 hrs on the gimbal away from home: the work IS the workout. Guilt is banned."};
+function renderCheck(){
+  const d=day(), k=curKey();
+  const row=document.getElementById("daytypeRow"); row.innerHTML="";
+  DAYTYPES.forEach(([v,lab])=>{
+    const b=document.createElement("button"); b.textContent=lab;
+    if(d.dayType===v) b.classList.add("sel");
+    b.onclick=()=>{ d.dayType=v; save(); renderCheck(); };
+    row.appendChild(b);
+  });
+  document.getElementById("daytypeHint").textContent=HINTS[d.dayType];
+  const items=itemsFor(k,d.dayType);
+  const list=document.getElementById("checklist"); list.innerHTML="";
+  let done=0;
+  items.forEach(it=>{
+    const checked=!!d.checks[it.id]; if(checked) done++;
+    const div=document.createElement("div"); div.className="chk"+(checked?" done":"");
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=checked; cb.id="c_"+it.id;
+    cb.onchange=()=>{ d.checks[it.id]=cb.checked; save(); renderCheck(); };
+    const lab=document.createElement("label"); lab.htmlFor="c_"+it.id;
+    lab.innerHTML=it.label+(it.sub?'<span class="sub">'+it.sub+"</span>":"");
+    div.appendChild(cb); div.appendChild(lab); list.appendChild(div);
+  });
+  document.getElementById("chkCount").textContent=done+"/"+items.length;
+  document.getElementById("chkProg").style.width=(items.length?Math.round(100*done/items.length):0)+"%";
+  document.getElementById("stepsInput").value=d.steps??"";
+  document.getElementById("stepTargetLbl").textContent=DB.settings.stepTarget.toLocaleString();
+  const keys=lastNDays(7);
+  const vals=keys.map(x=>DB.days[x]&&DB.days[x].steps?DB.days[x].steps:null).filter(v=>v!==null);
+  const hint=document.getElementById("stepHint");
+  if(vals.length>=4){
+    const avg=Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    if(avg>=DB.settings.stepTarget && DB.settings.stepTarget<8000){
+      hint.style.display="block";
+      hint.textContent="7-day avg "+avg.toLocaleString()+" ≥ target. If urgency/leaks aren't rising, raise the target by 1,000 in Settings (Phase 1 ceiling: 8,000).";
+    } else hint.style.display="none";
+  } else hint.style.display="none";
+  const oo=document.getElementById("oneoffs"); oo.innerHTML="";
+  ONEOFFS.forEach(t=>{
+    const checked=!!DB.oneoffs[t.id];
+    const div=document.createElement("div"); div.className="chk"+(checked?" done":"");
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=checked; cb.id="o_"+t.id;
+    cb.onchange=()=>{ DB.oneoffs[t.id]=cb.checked; save(); renderCheck(); };
+    const lab=document.createElement("label"); lab.htmlFor="o_"+t.id; lab.textContent=t.label;
+    div.appendChild(cb); div.appendChild(lab); oo.appendChild(div);
+  });
+}
+function saveSteps(){
+  const v=parseInt(document.getElementById("stepsInput").value,10);
+  day().steps=isNaN(v)?null:v; save(); toast("Steps saved"); renderAll();
+}
+
+// ---------- ingested: drinks ----------
+function presets(){ return DB.settings.drinkPresets; }
+function renderDrinkUI(){
+  const sel=document.getElementById("drinkSelect");
+  const cur=sel.value;
+  sel.innerHTML="";
+  presets().forEach((p,i)=>{
+    const o=document.createElement("option"); o.value=i; o.textContent=p.name+" ("+p.ml+"ml"+(p.caff?", "+p.caff+" shot"+(p.caff>1?"s":""):"")+")";
+    sel.appendChild(o);
+  });
+  if(cur && cur<presets().length) sel.value=cur;
+  drinkSelected();
+  const q=document.getElementById("quickDrinks"); q.innerHTML="";
+  presets().slice(0,4).forEach((p)=>{
+    const b=document.createElement("button"); b.className="btn";
+    b.textContent=p.name+" "+p.ml;
+    b.onclick=()=>logDrink(p, p.ml);
+    q.appendChild(b);
+  });
+}
+function drinkSelected(){
+  const p=presets()[+document.getElementById("drinkSelect").value];
+  if(p) document.getElementById("drinkMl").value=p.ml;
+}
+function addSelectedDrink(){
+  const p=presets()[+document.getElementById("drinkSelect").value];
+  if(!p) return;
+  const ml=parseInt(document.getElementById("drinkMl").value,10);
+  logDrink(p, isNaN(ml)?p.ml:ml);
+}
+function logDrink(p, ml){
+  day().drinks.push({t:entryTime("drinkTime"), ml:ml, label:p.name, caff:p.caff||0});
+  document.getElementById("drinkTime").value="";
+  save(); renderIngest(); toast("+"+ml+"ml "+p.name);
+}
+function addPreset(){
+  const name=document.getElementById("npName").value.trim();
+  const ml=parseInt(document.getElementById("npMl").value,10);
+  const caff=parseFloat(document.getElementById("npCaff").value)||0;
+  if(!name||isNaN(ml)||ml<=0) return toast("Need a name and ml");
+  DB.settings.drinkPresets.push({name, ml, caff});
+  ["npName","npMl","npCaff"].forEach(id=>document.getElementById(id).value="");
+  save(); renderDrinkUI(); toast("Added to drink list");
+}
+
+// ---------- ingested: meds ----------
+function renderMedUI(){
+  const sel=document.getElementById("medSelect");
+  if(!sel.hasChildNodes()){
+    MEDS.forEach(m=>{ const o=document.createElement("option"); o.value=m; o.textContent=m; sel.appendChild(o); });
+  }
+  medSelected();
+}
+function medSelected(){
+  const other=document.getElementById("medSelect").value==="Other";
+  document.getElementById("medOther").style.display=other?"block":"none";
+}
+function saveMed(){
+  let name=document.getElementById("medSelect").value;
+  if(name==="Other"){
+    name=document.getElementById("medOther").value.trim();
+    if(!name) return toast("Name the other med/supplement");
+  }
+  const dose=document.getElementById("medDose").value.trim();
+  day().meds.push({t:entryTime("medTime"), name, dose:dose||null});
+  document.getElementById("medDose").value=""; document.getElementById("medTime").value="";
+  document.getElementById("medOther").value="";
+  save(); renderIngest(); toast(name+" logged");
+}
+
+// ---------- ingested: food ----------
+function saveFood(){
+  const text=document.getElementById("foodText").value.trim();
+  if(!text) return toast("Describe the food first");
+  day().food.push({t:entryTime("foodTime"), text});
+  document.getElementById("foodText").value=""; document.getElementById("foodTime").value="";
+  save(); renderIngest(); toast("Food logged");
+}
+
+function renderIngest(){
+  const d=day();
+  const total=d.drinks.reduce((s,x)=>s+x.ml,0);
+  const caff=d.drinks.reduce((s,x)=>s+(x.caff||0),0);
+  document.getElementById("waterTotal").textContent=total.toLocaleString();
+  document.getElementById("waterTarget2").textContent=DB.settings.waterTarget.toLocaleString();
+  document.getElementById("caffTotal").textContent=(Math.round(caff*10)/10);
+  const dl=document.getElementById("drinkList"); dl.innerHTML="";
+  d.drinks.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    div.innerHTML="<span>"+x.t+" · "+x.label+" "+x.ml+"ml</span>";
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.drinks,i,renderIngest); div.appendChild(del); dl.appendChild(div);
+  });
+  const mlst=document.getElementById("medList"); mlst.innerHTML="";
+  d.meds.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    div.innerHTML='<span>'+x.t+' · <span class="pill med">'+x.name+"</span>"+(x.dose?" "+x.dose:"")+"</span>";
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.meds,i,renderIngest); div.appendChild(del); mlst.appendChild(div);
+  });
+  const fl=document.getElementById("foodList"); fl.innerHTML="";
+  d.food.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    const sp=document.createElement("span"); sp.textContent=x.t+" · "+x.text; div.appendChild(sp);
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.food,i,renderIngest); div.appendChild(del); fl.appendChild(div);
+  });
+}
+
+// ---------- body: wees / leaks ----------
+let selUrgency=null, selDur=null, selPat=null, selLeakSize=null;
+function pickUrgency(u){ selUrgency=u;
+  document.querySelectorAll("#urgencyRow .btn").forEach(b=>b.classList.toggle("sel", +b.dataset.u===u)); }
+function pickDur(v){ selDur=(selDur===v)?null:v;
+  document.querySelectorAll("#durRow .btn").forEach(b=>b.classList.toggle("sel", b.dataset.d===selDur)); }
+function pickPat(v){ selPat=(selPat===v)?null:v;
+  document.querySelectorAll("#patRow .btn").forEach(b=>b.classList.toggle("sel", b.dataset.p===selPat)); }
+function saveVoid(){
+  if(selUrgency===null) return toast("Pick an urge level first");
+  const ml=parseInt(document.getElementById("voidMl").value,10);
+  const note=document.getElementById("voidNote").value.trim();
+  day().voids.push({t:nowTime(), urgency:selUrgency, ml:isNaN(ml)?null:ml,
+    dur:selDur, pat:selPat, note:note||null});
+  selUrgency=null; selDur=null; selPat=null;
+  document.getElementById("voidMl").value=""; document.getElementById("voidNote").value="";
+  document.querySelectorAll("#urgencyRow .btn,#durRow .btn,#patRow .btn").forEach(b=>b.classList.remove("sel"));
+  save(); renderBody(); toast("Wee logged");
+}
+function pickLeakSize(s){ selLeakSize=s;
+  document.querySelectorAll("#leakSizeRow .btn").forEach(b=>b.classList.toggle("sel", b.dataset.s===s)); }
+function saveLeak(){
+  if(!selLeakSize) return toast("Pick a leak size first");
+  const note=document.getElementById("leakNote").value.trim();
+  day().leaks.push({t:nowTime(), size:selLeakSize, note:note||null});
+  selLeakSize=null; document.getElementById("leakNote").value="";
+  document.querySelectorAll("#leakSizeRow .btn").forEach(b=>b.classList.remove("sel"));
+  save(); renderBody(); toast("Leak logged");
+}
+function delItem(arr,i,rerender){ arr.splice(i,1); save(); rerender(); }
+
+// ---------- body: bowel / notes / bench / measurements ----------
+let selBristol=null, selStrain=false, selAssist=false, selTrigger=false;
+function pickBristol(b){ selBristol=b;
+  document.querySelectorAll("#bristolRow .btn").forEach(x=>x.classList.toggle("sel", +x.dataset.b===b)); }
+function toggleStrain(){ selStrain=!selStrain;
+  const b=document.getElementById("strainBtn"); b.textContent="Strained? "+(selStrain?"Yes":"No"); b.classList.toggle("sel",selStrain); }
+function toggleAssist(){ selAssist=!selAssist;
+  const b=document.getElementById("assistBtn"); b.textContent="Manual assist? "+(selAssist?"Yes":"No"); b.classList.toggle("sel",selAssist); }
+function toggleTrigger(){ selTrigger=!selTrigger;
+  const b=document.getElementById("trigBtn"); b.textContent="Trigger position? "+(selTrigger?"Yes":"No"); b.classList.toggle("sel",selTrigger); }
+function saveBowel(){
+  if(selBristol===null) return toast("Pick a Bristol type");
+  const note=document.getElementById("bowelNote").value.trim();
+  day().bowel.push({t:nowTime(),bristol:selBristol,strain:selStrain,assist:selAssist,note:note||null});
+  selBristol=null; selStrain=false; selAssist=false;
+  document.getElementById("bowelNote").value="";
+  document.querySelectorAll("#bristolRow .btn").forEach(x=>x.classList.remove("sel"));
+  const sb=document.getElementById("strainBtn"); sb.textContent="Strained? No"; sb.classList.remove("sel");
+  const ab=document.getElementById("assistBtn"); ab.textContent="Manual assist? No"; ab.classList.remove("sel");
+  save(); renderBody(); toast("Logged");
+}
+function saveJot(){
+  const t=document.getElementById("jotText").value.trim();
+  if(!t) return toast("Write something first");
+  day().notes.push({t:nowTime(),text:t,trigger:selTrigger});
+  document.getElementById("jotText").value="";
+  const wasTrigger=selTrigger;
+  selTrigger=false;
+  const b=document.getElementById("trigBtn"); b.textContent="Trigger position? No"; b.classList.remove("sel");
+  save(); renderBody();
+  toast(wasTrigger?"📸 Saved — now snap a photo of the position and send it to Claude!":"Note saved");
+}
+function saveBench(){
+  const values={}; let any=false;
+  BENCH.forEach(b=>{
+    const v=parseFloat(document.getElementById("b_"+b.id).value);
+    if(!isNaN(v)){ values[b.id]=v; any=true; }
+  });
+  if(!any) return toast("Enter at least one number");
+  DB.benchmarks.push({date:curKey(), values});
+  BENCH.forEach(b=>document.getElementById("b_"+b.id).value="");
+  save(); renderBody(); toast("Benchmark session saved — send Claude the footage!");
+}
+function saveMeasure(){
+  const g=id=>{ const v=parseFloat(document.getElementById(id).value); return isNaN(v)?null:v; };
+  const m={date:curKey(), weight:g("mWeight"), waist:g("mWaist"), hips:g("mHips"), glutes:g("mGlutes"),
+           thighL:g("mThighL"), thighR:g("mThighR"), rhr:g("mRHR"), neck:g("mNeck"), chest:g("mChest"),
+           note:document.getElementById("mNote").value.trim()||null};
+  if([m.weight,m.waist,m.hips,m.glutes,m.thighL,m.thighR,m.rhr,m.neck,m.chest].every(v=>v===null)) return toast("Enter at least one number");
+  DB.measurements.push(m);
+  ["mWeight","mWaist","mHips","mGlutes","mThighL","mThighR","mRHR","mNeck","mChest","mNote"].forEach(id=>document.getElementById(id).value="");
+  save(); renderBody(); toast("Measurements saved");
+}
+const DURLBL={brief:"<1min", minutes:"1-10min", long:"10+min"};
+const PATLBL={constant:"constant", onoff:"on & off"};
+function renderBody(){
+  const d=day();
+  document.getElementById("voidCount").textContent=d.voids.length;
+  document.getElementById("leakCount").textContent=d.leaks.length;
+  const vl=document.getElementById("voidList"); vl.innerHTML="";
+  d.voids.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    let extra="";
+    if(x.dur) extra+=" · "+DURLBL[x.dur];
+    if(x.pat) extra+=" · "+PATLBL[x.pat];
+    if(x.ml) extra+=" · "+x.ml+"ml";
+    if(x.note) extra+=" · "+x.note;
+    div.innerHTML="<span>"+x.t+' · <span class="pill u'+x.urgency+'">urge '+x.urgency+"</span>"+extra+"</span>";
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.voids,i,renderBody); div.appendChild(del); vl.appendChild(div);
+  });
+  const ll=document.getElementById("leakList"); ll.innerHTML="";
+  d.leaks.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    div.innerHTML="<span>"+x.t+' · <span class="pill leak">'+x.size+"</span>"+(x.note?" · "+x.note:"")+"</span>";
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.leaks,i,renderBody); div.appendChild(del); ll.appendChild(div);
+  });
+  const bl=document.getElementById("bowelList"); bl.innerHTML="";
+  d.bowel.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    div.innerHTML="<span>"+x.t+" · Bristol "+x.bristol+(x.strain?" · strained":"")+(x.assist?" · assisted":"")+(x.note?" · "+x.note:"")+"</span>";
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.bowel,i,renderBody); div.appendChild(del); bl.appendChild(div);
+  });
+  const jl=document.getElementById("jotList"); jl.innerHTML="";
+  d.notes.forEach((x,i)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    const sp=document.createElement("span");
+    sp.innerHTML=(x.trigger?'<span class="pill trig">📸 trigger</span> ':"")+x.t+" · ";
+    sp.appendChild(document.createTextNode(x.text));
+    div.appendChild(sp);
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕";
+    del.onclick=()=>delItem(d.notes,i,renderBody); div.appendChild(del); jl.appendChild(div);
+  });
+  const bg=document.getElementById("benchGrid");
+  if(!bg.hasChildNodes()){
+    BENCH.forEach(b=>{
+      const lab=document.createElement("label"); lab.textContent=b.label; lab.htmlFor="b_"+b.id;
+      const inp=document.createElement("input"); inp.type="number"; inp.step="0.5"; inp.id="b_"+b.id; inp.placeholder="–";
+      bg.appendChild(lab); bg.appendChild(inp);
+    });
+  }
+  const bList=document.getElementById("benchList"); bList.innerHTML="";
+  DB.benchmarks.slice().reverse().forEach(s=>{
+    const n=Object.keys(s.values).length;
+    const div=document.createElement("div"); div.className="logitem";
+    div.innerHTML="<span>"+s.date+" · "+n+" tests recorded</span>";
+    bList.appendChild(div);
+  });
+  const mlist=document.getElementById("measureList"); mlist.innerHTML="";
+  DB.measurements.slice().reverse().forEach((m)=>{
+    const div=document.createElement("div"); div.className="logitem";
+    const parts=[];
+    if(m.weight!=null)parts.push(m.weight+"kg");
+    if(m.waist!=null)parts.push("waist "+m.waist);
+    if(m.hips!=null)parts.push("hips "+m.hips);
+    if(m.glutes!=null)parts.push("glutes "+m.glutes);
+    if(m.thighL!=null)parts.push("L thigh "+m.thighL);
+    if(m.thighR!=null)parts.push("R thigh "+m.thighR);
+    if(m.rhr!=null)parts.push("RHR "+m.rhr);
+    div.innerHTML="<span>"+m.date+" · "+parts.join(" · ")+(m.note?" · "+m.note:"")+"</span>";
+    mlist.appendChild(div);
+  });
+}
+
+// ---------- trends ----------
+function lastNDays(n){
+  const out=[]; const d=new Date();
+  for(let i=n-1;i>=0;i--){ const x=new Date(d); x.setDate(d.getDate()-i); out.push(dkey(x)); }
+  return out;
+}
+function drawChart(elId, labId, vals, labels, max){
+  const el=document.getElementById(elId), lab=document.getElementById(labId);
+  el.innerHTML=""; lab.innerHTML="";
+  const m=Math.max(max||0, ...vals, 1);
+  vals.forEach((v,i)=>{
+    const b=document.createElement("div"); b.className="bar"+(i===vals.length-1?" today":"");
+    b.style.height=Math.round(100*v/m)+"%"; b.title=labels[i]+": "+v;
+    el.appendChild(b);
+    const s=document.createElement("span"); s.textContent=labels[i].slice(8); lab.appendChild(s);
+  });
+}
+function coreDone(k){
+  const d=DB.days[k]; if(!d) return false;
+  if(d.dayType==="event") return !!d.checks.log;
+  return !!d.checks.dt && !!d.checks.log;
+}
+function renderTrends(){
+  const keys=lastNDays(14);
+  const get=k=>DB.days[k];
+  drawChart("chUrg","chUrgL", keys.map(k=>{const d=get(k); return d?d.voids.filter(v=>v.urgency>=2).length:0;}), keys);
+  drawChart("chLeak","chLeakL", keys.map(k=>{const d=get(k); return d?(d.leaks?d.leaks.length:0):0;}), keys);
+  drawChart("chSteps","chStepsL", keys.map(k=>{const d=get(k); return d&&d.steps?d.steps:0;}), keys, DB.settings.stepTarget);
+  drawChart("chWater","chWaterL", keys.map(k=>{const d=get(k); return d?d.drinks.reduce((s,x)=>s+x.ml,0):0;}), keys, DB.settings.waterTarget);
+  drawChart("chCaff","chCaffL", keys.map(k=>{const d=get(k); return d?Math.round(d.drinks.reduce((s,x)=>s+(x.caff||0),0)*10)/10:0;}), keys, 4);
+  drawChart("chChk","chChkL", keys.map(k=>{
+    const d=get(k); if(!d) return 0;
+    const items=itemsFor(k,d.dayType); if(!items.length) return 0;
+    return Math.round(100*items.filter(it=>d.checks[it.id]).length/items.length);
+  }), keys, 100);
+  let cur=0; const allKeys=lastNDays(365);
+  for(let i=allKeys.length-1;i>=0;i--){
+    const k=allKeys[i];
+    if(k===today() && !coreDone(k)) continue;
+    if(coreDone(k)) cur++; else break;
+  }
+  let best=0,run=0;
+  allKeys.forEach(k=>{ if(coreDone(k)){run++; best=Math.max(best,run);} else run=0; });
+  document.getElementById("streakNow").textContent=cur;
+  document.getElementById("streakBest").textContent=best;
+}
+
+// ---------- export / import ----------
+function exportText(){
+  const keys=Object.keys(DB.days).sort();
+  const lines=["SIA EXPORT — generated "+today()];
+  keys.forEach(k=>{
+    const d=DB.days[k];
+    const items=itemsFor(k,d.dayType);
+    const done=items.filter(it=>d.checks[it.id]).length;
+    const water=d.drinks.reduce((s,x)=>s+x.ml,0);
+    const caff=Math.round(d.drinks.reduce((s,x)=>s+(x.caff||0),0)*10)/10;
+    const alc=d.drinks.filter(x=>/alcohol/i.test(x.label)).length;
+    const u2=d.voids.filter(v=>v.urgency>=2).length;
+    const leaks=d.leaks?d.leaks.length:0;
+    let line=k+" ("+d.dayType+"): checklist "+done+"/"+items.length+
+      ", steps "+(d.steps??"–")+", water "+water+"ml, caffeine "+caff+" shots"+(alc?", alcohol "+alc:"")+
+      ", wees "+d.voids.length+" (urge2-3: "+u2+"), leaks "+leaks;
+    if(d.bowel.length) line+=", bowel: "+d.bowel.map(b=>"B"+b.bristol+(b.strain?"+strain":"")+(b.assist?"+assist":"")+(b.note?" ["+b.note+"]":"")).join(", ");
+    lines.push(line);
+    const weeDetail=d.voids.filter(v=>v.dur||v.pat||v.ml||v.note)
+      .map(v=>"   wee "+v.t+" u"+v.urgency+(v.dur?" "+DURLBL[v.dur]:"")+(v.pat?" "+PATLBL[v.pat]:"")+(v.ml?" "+v.ml+"ml":"")+(v.note?" ["+v.note+"]":""));
+    weeDetail.forEach(w=>lines.push(w));
+    (d.leaks||[]).forEach(l=>lines.push("   leak "+l.t+" "+l.size+(l.note?" ["+l.note+"]":"")));
+    (d.meds||[]).forEach(m=>lines.push("   med "+m.t+": "+m.name+(m.dose?" "+m.dose:"")));
+    (d.food||[]).forEach(f=>lines.push("   food "+f.t+": "+f.text));
+    d.notes.forEach(n=>lines.push("   "+(n.trigger?"TRIGGER-POSITION (photo?) ":"note ")+n.t+": "+n.text));
+  });
+  if(DB.benchmarks.length){
+    lines.push("BENCHMARKS:");
+    DB.benchmarks.forEach(s=>{
+      const vals=BENCH.filter(b=>s.values[b.id]!==undefined).map(b=>b.id+"="+s.values[b.id]).join(", ");
+      lines.push("  "+s.date+": "+vals);
+    });
+  }
+  if(DB.measurements.length){
+    lines.push("MEASUREMENTS:");
+    DB.measurements.forEach(m=>lines.push("  "+m.date+": "+JSON.stringify(m)));
+  }
+  const oo=ONEOFFS.filter(t=>!DB.oneoffs[t.id]).map(t=>t.label);
+  if(oo.length) lines.push("ONE-OFFS STILL OPEN: "+oo.join(" | "));
+  putExport(lines.join("\n"));
+}
+function exportJSON(){ putExport(JSON.stringify(DB)); }
+function putExport(text){
+  const box=document.getElementById("exportBox"); box.value=text;
+  box.focus(); box.select();
+  try{ navigator.clipboard.writeText(text).then(()=>toast("Copied — paste to Claude")); }
+  catch(e){ try{ document.execCommand("copy"); toast("Copied"); }catch(e2){ toast("Select & copy manually"); } }
+}
+function importJSON(){
+  const raw=document.getElementById("importBox").value.trim();
+  if(!raw) return toast("Paste backup first");
+  try{
+    const obj=JSON.parse(raw);
+    if(!obj.days||!obj.settings) throw new Error("bad");
+    localStorage.setItem(KEY, JSON.stringify(obj));
+    DB=load(); renderAll(); toast("Backup imported");
+  }catch(e){ toast("⚠️ Not a valid backup"); }
+}
+function wipeAll(){
+  if(confirm("Erase ALL data on this device? Export a backup first!")){
+    localStorage.removeItem(KEY); DB=load(); renderAll(); toast("Erased");
+  }
+}
+
+// ---------- settings ----------
+function saveSettings(){
+  const s=parseInt(document.getElementById("setSteps").value,10);
+  const w=parseInt(document.getElementById("setWater").value,10);
+  if(!isNaN(s)&&s>0) DB.settings.stepTarget=s;
+  if(!isNaN(w)&&w>0) DB.settings.waterTarget=w;
+  save(); renderAll(); toast("Settings saved");
+}
+
+// ---------- ui ----------
+function showTab(name){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+name).classList.add("active");
+  document.getElementById("nav-"+name).classList.add("active");
+  renderAll();
+  window.scrollTo(0,0);
+}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200);
+}
+function renderAll(){
+  const k=curKey();
+  document.getElementById("dlabel").textContent=(k===today()?"Today · ":"")+fmtDate(k);
+  document.getElementById("fwdBtn").style.visibility=(k===today())?"hidden":"visible";
+  document.getElementById("setSteps").value=DB.settings.stepTarget;
+  document.getElementById("setWater").value=DB.settings.waterTarget;
+  renderCheck(); renderDrinkUI(); renderMedUI(); renderIngest(); renderBody(); renderTrends();
+}
+// steps push hook: SIA-url?steps=8123 (for iPhone Shortcuts automation)
+(function(){
+  try{
+    const p=new URLSearchParams(location.search);
+    if(p.has("steps")){
+      const v=parseInt(p.get("steps"),10);
+      if(!isNaN(v)&&v>=0){ const k=today();
+        if(!DB.days[k]) DB.days[k]=blankDay();
+        DB.days[k].steps=v; save(); }
+      history.replaceState(null,"",location.pathname);
+    }
+  }catch(e){}
+})();
+renderAll();
+</script>
+</body>
+</html>
