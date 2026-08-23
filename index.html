@@ -17,7 +17,7 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;}
-  body{padding-bottom:calc(70px + env(safe-area-inset-bottom));}
+  body{padding-bottom:calc(96px + env(safe-area-inset-bottom));}
   header{background:var(--navy);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:5;
     display:flex;justify-content:space-between;align-items:center;}
   header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:1px;}
@@ -32,7 +32,7 @@
   .muted{color:var(--mut);font-size:13px;}
   .small{font-size:12.5px;}
   nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
-    display:flex;z-index:10;padding-bottom:env(safe-area-inset-bottom);}
+    display:flex;z-index:10;padding-bottom:calc(env(safe-area-inset-bottom) + 20px);}
   nav button{flex:1;background:none;border:0;padding:8px 2px 6px;font-size:11px;color:var(--mut);min-height:56px;}
   nav button .ic{display:block;font-size:20px;margin-bottom:2px;}
   nav button.active{color:var(--navy);font-weight:700;}
@@ -222,6 +222,7 @@
     </div>
     <div class="inline" style="margin-bottom:8px">
       <input type="number" id="voidMl" inputmode="numeric" placeholder="ml (jug at home — optional)">
+      <input type="text" id="voidTime" placeholder="Time (blank = now)">
     </div>
     <input type="text" id="voidNote" placeholder="More context? (optional)" style="margin-bottom:8px">
     <button class="btn green" style="width:100%" onclick="saveVoid()">Save wee</button>
@@ -236,7 +237,10 @@
       <button class="btn" data-s="spurt" onclick="pickLeakSize('spurt')">💦 Spurt</button>
       <button class="btn" data-s="wet" onclick="pickLeakSize('wet')">🌊 Properly wet</button>
     </div>
-    <input type="text" id="leakNote" placeholder="What were you doing? (optional)" style="margin-bottom:8px">
+    <div class="inline" style="margin-bottom:8px">
+      <input type="text" id="leakNote" placeholder="What were you doing? (optional)">
+      <input type="text" id="leakTime" placeholder="Time (blank = now)">
+    </div>
     <button class="btn green" style="width:100%" onclick="saveLeak()">Save leak</button>
     <div class="loglist" id="leakList"></div>
   </div>
@@ -256,7 +260,10 @@
       <button class="btn" id="strainBtn" onclick="toggleStrain()">Strained? No</button>
       <button class="btn" id="assistBtn" onclick="toggleAssist()">Manual assist? No</button>
     </div>
-    <input type="text" id="bowelNote" placeholder="More context? (optional)" style="margin-bottom:8px">
+    <div class="inline" style="margin-bottom:8px">
+      <input type="text" id="bowelNote" placeholder="More context? (optional)">
+      <input type="text" id="bowelTime" placeholder="Time (blank = now)">
+    </div>
     <button class="btn green" style="width:100%" onclick="saveBowel()">Save bowel movement</button>
     <div class="loglist" id="bowelList"></div>
   </div>
@@ -750,10 +757,11 @@ function saveVoid(){
   if(selUrgency===null) return toast("Pick an urge level first");
   const ml=parseInt(document.getElementById("voidMl").value,10);
   const note=document.getElementById("voidNote").value.trim();
-  day().voids.push({t:nowTime(), urgency:selUrgency, ml:isNaN(ml)?null:ml,
+  day().voids.push({t:entryTime("voidTime"), urgency:selUrgency, ml:isNaN(ml)?null:ml,
     dur:selDur, pat:selPat, note:note||null});
   selUrgency=null; selDur=null; selPat=null;
   document.getElementById("voidMl").value=""; document.getElementById("voidNote").value="";
+  document.getElementById("voidTime").value="";
   document.querySelectorAll("#urgencyRow .btn,#durRow .btn,#patRow .btn").forEach(b=>b.classList.remove("sel"));
   save(); renderBody(); toast("Wee logged");
 }
@@ -762,8 +770,9 @@ function pickLeakSize(s){ selLeakSize=s;
 function saveLeak(){
   if(!selLeakSize) return toast("Pick a leak size first");
   const note=document.getElementById("leakNote").value.trim();
-  day().leaks.push({t:nowTime(), size:selLeakSize, note:note||null});
+  day().leaks.push({t:entryTime("leakTime"), size:selLeakSize, note:note||null});
   selLeakSize=null; document.getElementById("leakNote").value="";
+  document.getElementById("leakTime").value="";
   document.querySelectorAll("#leakSizeRow .btn").forEach(b=>b.classList.remove("sel"));
   save(); renderBody(); toast("Leak logged");
 }
@@ -782,9 +791,9 @@ function toggleTrigger(){ selTrigger=!selTrigger;
 function saveBowel(){
   if(selBristol===null) return toast("Pick a Bristol type");
   const note=document.getElementById("bowelNote").value.trim();
-  day().bowel.push({t:nowTime(),bristol:selBristol,strain:selStrain,assist:selAssist,note:note||null});
+  day().bowel.push({t:entryTime("bowelTime"),bristol:selBristol,strain:selStrain,assist:selAssist,note:note||null});
   selBristol=null; selStrain=false; selAssist=false;
-  document.getElementById("bowelNote").value="";
+  document.getElementById("bowelNote").value=""; document.getElementById("bowelTime").value="";
   document.querySelectorAll("#bristolRow .btn").forEach(x=>x.classList.remove("sel"));
   const sb=document.getElementById("strainBtn"); sb.textContent="Strained? No"; sb.classList.remove("sel");
   const ab=document.getElementById("assistBtn"); ab.textContent="Manual assist? No"; ab.classList.remove("sel");
