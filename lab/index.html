@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Movement Lab</title>
+<link rel="icon" href="data:,">
+<style>
+/* Layout: setup is one scrolling column; the session screen is a two-column stage (live cameras left, test card right) sized for reading from 2.5 m. */
+:root{
+  --bg:#0d1218; --panel:#151d26; --panel2:#1c2631; --ink:#e9eef3; --muted:#93a1b1; --line:#283442;
+  --accent:#8fb8ff; --rec:#ff5a45; --ok:#4fca8c; --warn:#f2c14e;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--sans)}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;line-height:1.1;text-wrap:balance}
+p{margin:0}
+a{color:var(--accent)}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:10px 16px;font-weight:600}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--accent);border-color:var(--accent);color:#0a1322}
+button.danger{background:var(--rec);border-color:var(--rec);color:#fff}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select,input[type=text],input[type=number],textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.mono{font-family:var(--mono)}
+.msg{font-size:.9rem;color:var(--warn)}
+.msg.ok{color:var(--ok)}
+
+/* ---------- setup ---------- */
+#setup .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:6px}
+.head h1{font-size:2rem;letter-spacing:.01em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card > h2{font-size:1.2rem}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cams{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.cam{display:flex;flex-direction:column;gap:8px;min-width:0}
+.cam .row select{flex:1;min-width:0}
+.pv{position:relative;background:#000;border-radius:8px;overflow:hidden;display:grid;place-items:center;aspect-ratio:16/9}
+.pv canvas{max-width:100%;max-height:100%;width:auto;height:auto;display:block}
+.pv .ph{position:absolute;color:var(--muted);font-size:.9rem}
+.mirror{transform:scaleX(-1)}
+.resume{border-color:var(--accent)}
+.tests{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px 18px}
+.tests .grp{grid-column:1/-1;margin-top:8px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tests label{display:flex;gap:8px;align-items:baseline;padding:3px 0}
+.go{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.go button{font-size:1.15rem;padding:14px 24px}
+
+/* ---------- session ---------- */
+#session{height:100%;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+.top .pos{font-family:var(--mono);color:var(--muted)}
+.top select{max-width:min(46vw,520px)}
+.top .sp{flex:1}
+.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(380px,1fr)}
+.feeds{position:relative;display:flex;flex-direction:column;gap:8px;padding:10px;min-height:0;min-width:0;background:#000}
+.feeds.row{flex-direction:row}
+.feeds .pv{flex:1;min-width:0;min-height:0;aspect-ratio:auto}
+.feeds .lab{position:absolute;top:8px;left:10px;font:600 .8rem/1 var(--mono);letter-spacing:.08em;color:#fff;background:rgba(0,0,0,.55);padding:4px 6px;border-radius:4px}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.overlay .big{font:800 min(28vh,220px)/1 var(--sans);color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.8)}
+.recbar{position:absolute;right:16px;top:14px;display:flex;gap:10px;align-items:center;background:rgba(0,0,0,.7);padding:8px 16px;border-radius:999px;font:700 1.6rem/1 var(--mono);color:#fff}
+.recbar i{width:16px;height:16px;border-radius:50%;background:var(--rec);display:inline-block}
+.recbar.timer i{background:var(--warn)}
+.cardcol{overflow:auto;padding:18px 20px 28px;display:flex;flex-direction:column;gap:14px;border-left:1px solid var(--line)}
+.slate{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.slate .n{font:700 1.2rem/1 var(--mono);color:var(--muted)}
+.tag{font:600 .75rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.tag.new{background:#1f2f47;border-color:#1f2f47;color:#9dbdf0}
+.tname{font-size:clamp(1.8rem,3.2vw,2.8rem);font-weight:800}
+.lbl{display:block;font:600 .72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.ppos{font-size:1.2rem}
+ol.steps{margin:0;padding-left:1.5rem;display:flex;flex-direction:column;gap:6px;font-size:1.2rem}
+.stop{color:var(--muted);font-size:1.02rem}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ctl .startbtn{font-size:1.3rem;padding:16px 28px}
+.status{font-size:.95rem}
+.fields{display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.field{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.field > .fl{font-weight:600;min-width:7.5rem}
+.field input[type=number]{width:6.5rem;font:600 1.3rem var(--mono)}
+.field input[type=text]{flex:1;min-width:10rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:999px;padding:8px 12px;font-weight:500;background:var(--bg)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.navrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.navrow .next{font-size:1.15rem;padding:14px 22px}
+.keys{font-size:.85rem;color:var(--muted)}
+.keys kbd{font:600 .8rem var(--mono);border:1px solid var(--line);border-radius:4px;padding:1px 5px;background:var(--panel2)}
+textarea.out{width:100%;min-height:260px;font:13px/1.45 var(--mono)}
+@media (max-width:900px){ .stage{grid-template-columns:1fr} .feeds{height:45vh} .cardcol{border-left:0} }
+</style>
+</head>
+<body>
+
+<!-- ======================= SETUP ======================= -->
+<div id="setup">
+ <div class="wrap">
+  <div class="head">
+   <h1>Movement Lab</h1>
+   <p class="muted">Two cameras, one test at a time, every clip and result saved to a folder on this Mac as you go. Use Chrome.</p>
+  </div>
+
+  <div class="card resume" id="resumeCard" hidden>
+   <h2>Unfinished session</h2>
+   <p id="resumeText"></p>
+   <div class="row"><button class="primary" id="resumeBtn" type="button">Resume it</button><button id="discardBtn" type="button">Start fresh instead</button></div>
+  </div>
+
+  <div class="card">
+   <h2>1. Cameras</h2>
+   <div class="row"><button class="primary" id="allowBtn" type="button">Allow cameras</button><span class="msg" id="camMsg"></span></div>
+   <div class="cams">
+    <div class="cam">
+     <div class="row"><strong>Front</strong><select id="devA" aria-label="Front camera"></select><select id="rotA" aria-label="Front rotation"><option value="0">Landscape</option><option value="90">Portrait, rotate right</option><option value="270">Portrait, rotate left</option></select></div>
+     <div class="pv" id="pvA"><canvas id="cvA"></canvas><span class="ph" id="phA">Not used</span></div>
+     <p class="small mono muted" id="infoA">Not used</p>
+    </div>
+    <div class="cam">
+     <div class="row"><strong>Side</strong><select id="devB" aria-label="Side camera"></select><select id="rotB" aria-label="Side rotation"><option value="0">Landscape</option><option value="90">Portrait, rotate right</option><option value="270">Portrait, rotate left</option></select></div>
+     <div class="pv" id="pvB"><canvas id="cvB"></canvas><span class="ph" id="phB">Not used</span></div>
+     <p class="small mono muted" id="infoB">Not used</p>
+    </div>
+   </div>
+   <p class="small muted">One camera is fine: set the other to None. If you only have one, put it side-on. iPhone through Continuity Camera: mount it landscape (portrait only zooms in) and turn Center Stage off in the Mac menu bar's camera icon.</p>
+  </div>
+
+  <div class="card">
+   <h2>2. Folder</h2>
+   <div class="row"><button class="primary" id="folderBtn" type="button">Choose folder</button><span id="folderName" class="mono"></span></div>
+   <p class="small muted">Pick <strong>SIA APP cameras</strong> so Claude can read the results. Each session gets its own subfolder with the clips, a few stills and the results.</p>
+   <p class="msg" id="folderMsg"></p>
+  </div>
+
+  <div class="card">
+   <h2>3. Tests</h2>
+   <div class="row"><label for="preset" class="muted">Preset</label><select id="preset"></select></div>
+   <div class="tests" id="testList"></div>
+  </div>
+
+  <div class="card">
+   <h2>4. Options</h2>
+   <div class="row">
+    <label for="cdSel">Countdown before each test</label>
+    <select id="cdSel"><option value="5">5 sec</option><option value="10">10 sec</option><option value="15">15 sec</option><option value="20">20 sec</option></select>
+    <label><input type="checkbox" id="voiceChk"> Voice cues</label>
+    <label><input type="checkbox" id="mirrorChk"> Mirror the front view on screen</label>
+   </div>
+   <p class="small muted">Mirroring only changes what you see. Recordings are never mirrored.</p>
+  </div>
+
+  <div class="go">
+   <button class="primary" id="startBtn" type="button">Start session</button>
+   <span class="msg" id="startMsg"></span>
+  </div>
+ </div>
+</div>
+
+<!-- ======================= SESSION ======================= -->
+<div id="session" hidden>
+ <div class="top">
+  <strong>Movement Lab</strong>
+  <span class="pos" id="posTxt"></span>
+  <select id="jump" aria-label="Jump to test"></select>
+  <span class="sp"></span>
+  <span class="small muted mono" id="folderTop"></span>
+  <button id="toSetup" type="button">Setup</button>
+  <button id="endBtn" type="button">Finish session</button>
+ </div>
+ <div class="stage">
+  <div class="feeds" id="feeds">
+   <div class="pv" id="bigA"><span class="lab">FRONT</span></div>
+   <div class="pv" id="bigB"><span class="lab">SIDE</span></div>
+   <div class="overlay" id="overlay" hidden><span class="big" id="overlayNum"></span></div>
+   <div class="recbar" id="recbar" hidden><i></i><span id="recTime">00:00.0</span></div>
+  </div>
+  <div class="cardcol" id="cardcol"></div>
+ </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var KEY = 'movement_lab_v1';           // separate from SIA's own storage key
+var $ = function(id){ return document.getElementById(id); };
+var DATA = null, TESTS = [], BYID = {}, FIELDS = {};
+var state = loadState();
+var rootDir = null, sessDir = null;
+var cams = {
+  A: {name:'Front', sel:$('devA'), rot:$('rotA'), cv:$('cvA'), pv:$('pvA'), ph:$('phA'), info:$('infoA'), big:$('bigA'), video:makeVideo(), stream:null, label:''},
+  B: {name:'Side',  sel:$('devB'), rot:$('rotB'), cv:$('cvB'), pv:$('pvB'), ph:$('phB'), info:$('infoB'), big:$('bigB'), video:makeVideo(), stream:null, label:''}
+};
+var run = null, recorder = null, chunks = [], recCanvas = document.createElement('canvas'), recCtx = recCanvas.getContext('2d'), panes = [];
+var writeQ = Promise.resolve();
+var H = 1080, BAND = 56;
+
+function makeVideo(){ var v = document.createElement('video'); v.muted = true; v.playsInline = true; v.autoplay = true;
+  v.style.cssText = 'position:fixed;left:-10px;top:-10px;width:2px;height:2px;opacity:0;pointer-events:none'; document.body.appendChild(v); return v; }
+function defaults(){ return {settings:{countdown:10, voice:true, mirror:true, rot:{A:0,B:0}, dev:{A:'',B:''}, preset:'all', picked:null}, session:null}; }
+function loadState(){ try{ var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.settings) return s; }catch(e){} return defaults(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function pad(n,w){ n = String(n); while (n.length < (w||2)) n = '0' + n; return n; }
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60).replace(/-$/,''); }
+function fmt(sec){ var m = Math.floor(sec/60), s = sec - m*60; return pad(m) + ':' + (s < 10 ? '0' : '') + s.toFixed(1); }
+function nowStamp(){ var d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+pad(d.getMinutes()); }
+function el(tag, cls, text){ var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+/* ---------------- storage of the folder handle ---------------- */
+function idb(){ return new Promise(function(res, rej){ var r = indexedDB.open('movement-lab', 1); r.onupgradeneeded = function(){ r.result.createObjectStore('kv'); }; r.onsuccess = function(){ res(r.result); }; r.onerror = function(){ rej(r.error); }; }); }
+function kvGet(k){ return idb().then(function(db){ return new Promise(function(res){ var q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = function(){ res(q.result); }; q.onerror = function(){ res(null); }; }); }).catch(function(){ return null; }); }
+function kvSet(k, v){ return idb().then(function(db){ return new Promise(function(res){ var tx = db.transaction('kv','readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = res; tx.onerror = res; }); }).catch(function(){}); }
+async function permitted(h){ if (!h) return false; var o = {mode:'readwrite'}; try{ if ((await h.queryPermission(o)) === 'granted') return true; return (await h.requestPermission(o)) === 'granted'; }catch(e){ return false; } }
+async function writeFile(dir, name, blob){ var fh = await dir.getFileHandle(name, {create:true}); var w = await fh.createWritable(); await w.write(blob); await w.close(); }
+function queueWrite(dir, name, blob){ writeQ = writeQ.then(function(){ return writeFile(dir, name, blob); }).catch(function(e){ status('Could not save ' + name + ': ' + e.message, true); }); return writeQ; }
+
+/* ---------------- tests ---------------- */
+async function loadTests(){
+  var r = await fetch('tests.json?v=' + Date.now(), {cache:'no-store'});
+  DATA = await r.json();
+  TESTS = []; BYID = {}; FIELDS = {};
+  DATA.blocks.forEach(function(b){ b.tests.forEach(function(t){ t.block = b.title; t.n = TESTS.length + 1; TESTS.push(t); BYID[t.id] = t; t.fields.forEach(function(f){ FIELDS[f.id] = f; }); }); });
+}
+function presetIds(id){ var p = DATA.presets.filter(function(x){ return x.id === id; })[0]; if (!p || p.tests === 'all') return TESTS.map(function(t){ return t.id; }); return p.tests.slice(); }
+function renderTestList(){
+  var box = $('testList'); box.innerHTML = '';
+  var picked = state.settings.picked || presetIds(state.settings.preset);
+  var last = '';
+  TESTS.forEach(function(t){
+    if (t.block !== last){ last = t.block; box.appendChild(el('div','grp', t.block)); }
+    var lab = el('label'); var cb = el('input'); cb.type = 'checkbox'; cb.value = t.id; cb.checked = picked.indexOf(t.id) >= 0;
+    cb.addEventListener('change', function(){ state.settings.picked = TESTS.filter(function(x){ var c = box.querySelector('input[value="'+x.id+'"]'); return c && c.checked; }).map(function(x){ return x.id; }); state.settings.preset = 'custom'; $('preset').value = 'custom'; save(); });
+    lab.appendChild(cb); lab.appendChild(el('span', null, pad(t.n) + '  ' + t.name + (t.film === false ? '  (no filming)' : '')));
+    box.appendChild(lab);
+  });
+}
+function renderPresets(){
+  var s = $('preset'); s.innerHTML = '';
+  DATA.presets.forEach(function(p){ var o = el('option', null, p.label); o.value = p.id; s.appendChild(o); });
+  var c = el('option', null, 'Custom selection'); c.value = 'custom'; s.appendChild(c);
+  s.value = state.settings.preset || 'all';
+  s.addEventListener('change', function(){ state.settings.preset = s.value; if (s.value !== 'custom') state.settings.picked = presetIds(s.value); save(); renderTestList(); });
+}
+
+/* ---------------- cameras ---------------- */
+var devList = [];
+async function listCams(){
+  devList = (await navigator.mediaDevices.enumerateDevices()).filter(function(d){ return d.kind === 'videoinput'; });
+  ['A','B'].forEach(function(k){
+    var c = cams[k], keep = state.settings.dev[k];
+    c.sel.innerHTML = '';
+    var none = el('option', null, 'None'); none.value = ''; c.sel.appendChild(none);
+    devList.forEach(function(d, i){ var o = el('option', null, d.label || ('Camera ' + (i+1))); o.value = d.deviceId; c.sel.appendChild(o); });
+    if (keep && devList.some(function(d){ return d.deviceId === keep; })) c.sel.value = keep;
+    else c.sel.value = guess(k);
+  });
+}
+function guess(k){
+  var words = k === 'A' ? ['facetime','built-in','macbook'] : ['iphone'];
+  for (var i = 0; i < devList.length; i++){ var l = (devList[i].label || '').toLowerCase(); if (l.indexOf('desk view') >= 0) continue;
+    for (var j = 0; j < words.length; j++) if (l.indexOf(words[j]) >= 0) return devList[i].deviceId; }
+  return '';
+}
+function stopCam(k){ var c = cams[k]; if (c.stream){ c.stream.getTracks().forEach(function(t){ t.stop(); }); } c.stream = null; c.video.srcObject = null; c.label = ''; }
+async function startCam(k){
+  var c = cams[k]; stopCam(k);
+  var id = c.sel.value; state.settings.dev[k] = id; save();
+  if (!id){ c.info.textContent = 'Not used'; c.ph.hidden = false; c.ph.textContent = 'Not used'; return; }
+  c.ph.hidden = false; c.ph.textContent = 'Starting…';
+  try{
+    var stream = await navigator.mediaDevices.getUserMedia({audio:false, video:{deviceId:{exact:id}, width:{ideal:1920}, height:{ideal:1080}, frameRate:{ideal:30}}});
+    var track = stream.getVideoTracks()[0], s = track.getSettings();
+    if ((s.width || 0) < 1280){
+      var tries = [{width:{exact:1920}, height:{exact:1080}}, {width:{exact:1280}, height:{exact:720}}];
+      for (var i = 0; i < tries.length; i++){ try{ await track.applyConstraints(Object.assign({frameRate:{ideal:30}}, tries[i])); s = track.getSettings(); if (s.width >= 1280) break; }catch(e){} }
+    }
+    var caps = track.getCapabilities ? track.getCapabilities() : {};
+    c.stream = stream; c.label = track.label; c.video.srcObject = stream; await c.video.play().catch(function(){});
+    c.info.textContent = track.label + ' · ' + s.width + '×' + s.height + ' · ' + Math.round(s.frameRate || 0) + ' fps' + (caps.width ? '  (camera max ' + caps.width.max + '×' + caps.height.max + ')' : '');
+    c.ph.hidden = true;
+    track.addEventListener('ended', function(){ c.info.textContent = 'Camera disconnected. Reconnect it and press Allow cameras.'; c.ph.hidden = false; c.ph.textContent = 'Disconnected'; });
+  }catch(e){ c.info.textContent = 'Failed: ' + e.name + ' — ' + e.message; c.ph.textContent = 'Failed'; }
+}
+async function allowCams(){
+  $('camMsg').textContent = '';
+  try{
+    var tmp = await navigator.mediaDevices.getUserMedia({video:true, audio:false});
+    await listCams();                                  // list while access is live
+    tmp.getTracks().forEach(function(t){ t.stop(); });
+    await startCam('A'); await startCam('B');
+    $('camMsg').className = 'msg ok'; $('camMsg').textContent = devList.length + ' camera' + (devList.length === 1 ? '' : 's') + ' found.';
+  }catch(e){ $('camMsg').className = 'msg'; $('camMsg').textContent = 'Camera access failed: ' + e.name + '. Check Chrome allowed the camera for this site.'; }
+}
+function active(k){ var v = cams[k].video; return !!cams[k].stream && v.videoWidth > 0; }
+function anyCam(){ return active('A') || active('B'); }
+function rotSize(k){ var v = cams[k].video, r = state.settings.rot[k]; return (r === 90 || r === 270) ? [v.videoHeight, v.videoWidth] : [v.videoWidth, v.videoHeight]; }
+function drawRot(ctx, v, rot, dx, dy, dw, dh){
+  ctx.save(); ctx.translate(dx + dw/2, dy + dh/2); ctx.rotate(rot * Math.PI / 180);
+  var w = (rot === 90 || rot === 270) ? dh : dw, h = (rot === 90 || rot === 270) ? dw : dh;
+  ctx.drawImage(v, -w/2, -h/2, w, h); ctx.restore();
+}
+
+/* ---------------- drawing loop ---------------- */
+function frame(){
+  ['A','B'].forEach(function(k){
+    var c = cams[k]; if (!active(k)) return;
+    var sz = rotSize(k), cv = c.cv;
+    if (cv.width !== sz[0] || cv.height !== sz[1]){ cv.width = sz[0]; cv.height = sz[1]; }
+    var ctx = cv.getContext('2d');
+    drawRot(ctx, c.video, state.settings.rot[k], 0, 0, sz[0], sz[1]);
+    // framing guides: head line, feet line, centre line (preview only, never recorded)
+    ctx.save(); ctx.lineWidth = Math.max(2, sz[1] / 300); ctx.setLineDash([sz[1]/60, sz[1]/90]);
+    ctx.strokeStyle = 'rgba(79,202,140,.9)';
+    [0.04, 0.96].forEach(function(f){ ctx.beginPath(); ctx.moveTo(0, sz[1]*f); ctx.lineTo(sz[0], sz[1]*f); ctx.stroke(); });
+    ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.beginPath(); ctx.moveTo(sz[0]/2, 0); ctx.lineTo(sz[0]/2, sz[1]); ctx.stroke();
+    ctx.restore();
+  });
+  if (run && run.phase === 'live'){
+    var el2 = (performance.now() - run.t0) / 1000;
+    $('recTime').textContent = fmt(el2);
+    if (run.film) drawComposite(el2);
+    fireCues(el2);
+    if (run.autoStop && el2 >= run.autoStop) stopTest();
+  }
+  requestAnimationFrame(frame);
+}
+function layoutComposite(){
+  panes = []; var x = 0;
+  ['A','B'].forEach(function(k){ if (!active(k)) return; var sz = rotSize(k); var w = Math.round(H * sz[0] / sz[1] / 2) * 2; panes.push({k:k, x:x, w:w}); x += w; });
+  recCanvas.width = Math.max(2, x); recCanvas.height = H + BAND;
+}
+function drawComposite(t){
+  var ctx = recCtx; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, recCanvas.width, recCanvas.height);
+  panes.forEach(function(p){
+    var c = cams[p.k]; if (!active(p.k)) return;
+    drawRot(ctx, c.video, state.settings.rot[p.k], p.x, BAND, p.w, H);
+    ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(p.x + 10, BAND + 10, 86, 30);
+    ctx.fillStyle = '#fff'; ctx.font = '600 20px ui-monospace, Menlo, monospace'; ctx.fillText(c.name.toUpperCase(), p.x + 18, BAND + 32);
+  });
+  var tst = run.test;
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, recCanvas.width, BAND);
+  ctx.fillStyle = '#fff'; ctx.font = '600 28px ui-monospace, Menlo, monospace';
+  ctx.fillText(pad(tst.n) + '  ' + tst.name + '   ' + fmt(t) + '   ' + run.stamp, 16, 38);
+}
+
+/* ---------------- voice ---------------- */
+function say(text, interrupt){
+  if (!state.settings.voice || !window.speechSynthesis) return;
+  if (interrupt) speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text); u.rate = 1.05; speechSynthesis.speak(u);
+}
+function buildCues(t){
+  var list = [];
+  if (t.cues) t.cues.forEach(function(c){ list.push({t:c.t, say:c.say}); });
+  else {
+    list.push({t:0, say:'Go'});
+    if (t.every){ var end = t.max || 600; for (var s = t.every; s < end; s += t.every) list.push({t:s, say:String(s)}); }
+    if (t.max) list.push({t:t.max, say:'Time'});
+  }
+  return list.sort(function(a,b){ return a.t - b.t; });
+}
+function fireCues(el2){
+  while (run.cues.length && run.cues[0].t <= el2){ var c = run.cues.shift(); say(c.say, true); }
+  while (run.stills.length && run.stills[0] <= el2){ var s = run.stills.shift(); grabStill(Math.round(s) + 's'); }
+}
+
+/* ---------------- recording ---------------- */
+function pickMime(){
+  var c = ['video/mp4;codecs=avc1.640033','video/mp4;codecs=avc1.640028','video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+  for (var i = 0; i < c.length; i++) if (window.MediaRecorder && MediaRecorder.isTypeSupported(c[i])) return c[i];
+  return '';
+}
+function startRecording(){
+  layoutComposite(); drawComposite(0);
+  var stream = recCanvas.captureStream(30), mime = pickMime();
+  chunks = [];
+  function make(m){ var r = new MediaRecorder(stream, m ? {mimeType:m, videoBitsPerSecond:12000000} : {videoBitsPerSecond:12000000});
+    r.ondataavailable = function(e){ if (e.data && e.data.size) chunks.push(e.data); };
+    r.onerror = function(e){ status('Recording error: ' + ((e.error && e.error.message) || 'unknown') + '. Try Record again.', true); };
+    r.start(1000); return r; }
+  try{ recorder = make(mime); }
+  catch(e){ try{ recorder = make(MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm'); }catch(e2){ recorder = null; status('This browser could not start recording: ' + e2.message, true); } }
+}
+function stopRecording(){
+  return new Promise(function(res){ if (!recorder || recorder.state === 'inactive'){ res(null); return; }
+    recorder.onstop = function(){ res(new Blob(chunks, {type: recorder.mimeType || 'video/webm'})); }; recorder.stop(); });
+}
+function grabStill(label){
+  if (!run || !run.film || !sessDir) return;
+  var base = run.base, name = base + '-still-' + label + '.jpg', id = run.test.id;
+  var p = new Promise(function(res){ recCanvas.toBlob(function(b){ if (!b){ res(); return; } queueWrite(sessDir, name, b).then(function(){ addList('stills', id, name); res(); }); }, 'image/jpeg', 0.85); });
+  run.pending.push(p);
+}
+function addList(kind, id, name){ var s = state.session; s[kind][id] = s[kind][id] || []; if (s[kind][id].indexOf(name) < 0) s[kind][id].push(name); save(); }
+
+/* ---------------- session flow ---------------- */
+function cur(){ var s = state.session; return BYID[s.picked[s.idx]]; }
+function canStart(t){ return (t.film !== false && anyCam()) || !!(t.cues || t.every || t.autoStop); }
+var lastStatus = {text:'', bad:false};
+function status(text, bad){ lastStatus = {text:text, bad:!!bad}; var n = $('status'); if (n){ n.textContent = text; n.className = 'status ' + (bad ? 'msg' : 'muted'); } }
+
+function startTest(){
+  if (run) return;
+  var t = cur(); if (!canStart(t)) return;
+  var film = t.film !== false && anyCam() && !!sessDir;
+  var s = state.session; s.takes[t.id] = (s.takes[t.id] || 0) + (film ? 1 : 0); save();
+  var take = s.takes[t.id];
+  run = {test:t, film:film, phase:'countdown', cues:buildCues(t), stills:film ? (t.stills || [3]).slice() : [], pending:[],
+         autoStop: t.autoStop || (t.max ? t.max + 3 : null), stamp: new Date().toLocaleString('en-AU'),
+         base: pad(t.n) + '-' + t.id + '-' + slug(t.name) + (take > 1 ? '-take' + take : '')};
+  var left = state.settings.countdown;
+  $('overlay').hidden = false; $('overlayNum').textContent = left;
+  say(t.name + '. Get in position.', true);
+  renderCard();
+  run.timer = setInterval(function(){
+    left--;
+    if (left > 0){ $('overlayNum').textContent = left; if (left <= 3) say(String(left), true); }
+    else { clearInterval(run.timer); go(); }
+  }, 1000);
+}
+function go(){
+  $('overlay').hidden = true;
+  run.phase = 'live'; run.t0 = performance.now();
+  if (run.film) startRecording();
+  $('recbar').hidden = false; $('recbar').className = 'recbar' + (run.film ? '' : ' timer');
+  fireCues(0);
+  renderCard();
+}
+async function stopTest(){
+  if (!run || run.phase === 'saving') return;
+  var r = run;
+  if (r.phase === 'countdown'){ clearInterval(r.timer); $('overlay').hidden = true; if (r.film){ state.session.takes[r.test.id]--; save(); } run = null; speechSynthesis && speechSynthesis.cancel(); renderCard(); status('Cancelled. Nothing saved.'); return; }
+  r.phase = 'saving';
+  var dur = (performance.now() - r.t0) / 1000;
+  $('recbar').hidden = true;
+  if (r.film){ grabStill('end'); }
+  renderCard(); status('Saving…');
+  var blob = r.film ? await stopRecording() : null;
+  await Promise.all(r.pending);
+  var s = state.session;
+  s.dur[r.test.id] = Math.round(dur * 10) / 10;
+  if (blob && sessDir){
+    var ext = (blob.type.indexOf('mp4') >= 0) ? 'mp4' : 'webm';
+    var name = r.base + '.' + ext;
+    await queueWrite(sessDir, name, blob);
+    addList('clips', r.test.id, name);
+    status('Saved ' + name + ' (' + dur.toFixed(1) + ' s, ' + (blob.size/1048576).toFixed(1) + ' MB). Enter the result, then Save and next.');
+  } else status('Stopped at ' + dur.toFixed(1) + ' s. Enter the result, then Save and next.');
+  say('Stopped', true);
+  run = null; save(); writeResults(); renderCard();
+  var first = document.querySelector('#cardcol input'); if (first) first.focus();
+}
+function saveNext(){
+  if (run) return;
+  var s = state.session, t = cur();
+  s.done[t.id] = true; save(); writeResults();
+  if (s.idx < s.picked.length - 1){ s.idx++; save(); renderSession(); }
+  else showEnd();
+}
+function prev(){ if (run) return; var s = state.session; if (s.idx > 0){ s.idx--; save(); renderSession(); } }
+
+/* ---------------- results ---------------- */
+function beighton(){ var n = 0, hits = []; for (var i = 1; i <= 9; i++){ if (state.session.values['b'+i]){ n++; hits.push(FIELDS['b'+i].label); } } return {n:n, hits:hits}; }
+function val(id){ var v = state.session.values[id]; return (v == null || v === '') ? '–' : String(v); }
+function camDesc(k){ var c = cams[k]; if (!c.stream) return 'not used'; var s = c.stream.getVideoTracks()[0].getSettings(); return c.label + ', ' + s.width + '×' + s.height + ', ' + (state.settings.rot[k] ? 'rotated ' + state.settings.rot[k] + '°' : 'landscape'); }
+function buildText(){
+  var s = state.session, L = ['MOVEMENT LAB SESSION — ' + s.name, 'Front camera: ' + (s.cams && s.cams.A || '–'), 'Side camera: ' + (s.cams && s.cams.B || '–'), ''];
+  L.push('CORE 12 (same order as SIA Benchmarks)');
+  DATA.coreOrder.forEach(function(id){ L.push(FIELDS[id].core + ': ' + val(id)); });
+  L.push('', 'EXTRAS');
+  TESTS.forEach(function(t){ t.fields.forEach(function(f){ if (f.extra) L.push(f.extra + ': ' + val(f.id)); }); });
+  if (s.picked.indexOf('bei') >= 0){ var b = beighton(); L.push('Beighton: ' + (s.done.bei ? b.n + '/9' + (b.hits.length ? ' (' + b.hits.join('; ') + ')' : '') : '–')); }
+  L.push('Last Ritalin: ' + val('ritalin'), 'Last coffee: ' + val('coffee'));
+  var notes = s.picked.filter(function(id){ return s.notes[id]; }).map(function(id){ return pad(BYID[id].n) + ' ' + BYID[id].name + ': ' + s.notes[id]; });
+  L.push('', 'NOTES: ' + (notes.length ? '' : '–')); notes.forEach(function(n){ L.push('  ' + n); });
+  var notDone = s.picked.filter(function(id){ return !s.done[id]; }).map(function(id){ return BYID[id].name; });
+  L.push('', 'NOT DONE: ' + (notDone.length ? notDone.join(', ') : 'none'));
+  var clipCount = 0; Object.keys(s.clips).forEach(function(k){ clipCount += s.clips[k].length; });
+  L.push('Clips saved: ' + clipCount);
+  return L.join('\n');
+}
+function buildJSON(){
+  var s = state.session;
+  return {app:'movement-lab', version:1, testsVersion:DATA.version, session:s.name, started:s.started, updated:new Date().toISOString(), cameras:s.cams,
+    tests: s.picked.map(function(id){ var t = BYID[id]; var v = {}; t.fields.forEach(function(f){ if (s.values[f.id] != null && s.values[f.id] !== '') v[f.id] = s.values[f.id]; });
+      return {n:t.n, id:id, name:t.name, done:!!s.done[id], values:v, note:s.notes[id] || '', seconds:s.dur[id] || null, clips:s.clips[id] || [], stills:s.stills[id] || []}; })};
+}
+function writeResults(){
+  if (!sessDir || !state.session) return;
+  queueWrite(sessDir, 'results.json', new Blob([JSON.stringify(buildJSON(), null, 1)], {type:'application/json'}));
+  queueWrite(sessDir, 'results.txt', new Blob([buildText()], {type:'text/plain'}));
+}
+
+/* ---------------- session rendering ---------------- */
+function renderSession(){
+  var s = state.session; lastStatus = {text:'', bad:false};
+  $('posTxt').textContent = 'Test ' + (s.idx + 1) + ' of ' + s.picked.length;
+  var j = $('jump'); j.innerHTML = '';
+  s.picked.forEach(function(id, i){ var t = BYID[id]; var o = el('option', null, (s.done[id] ? '✓ ' : '   ') + pad(t.n) + '  ' + t.name); o.value = i; j.appendChild(o); });
+  j.value = s.idx;
+  $('folderTop').textContent = sessDir ? s.name : 'no folder';
+  // move live canvases into the big view; stack landscape feeds, put portrait feeds side by side
+  $('feeds').classList.toggle('row', ['A','B'].every(function(k){ return !cams[k].stream || state.settings.rot[k]; }));
+  ['A','B'].forEach(function(k){ var c = cams[k]; var on = !!c.stream; c.big.hidden = !on; if (on && c.cv.parentNode !== c.big) c.big.insertBefore(c.cv, c.big.firstChild); c.cv.classList.toggle('mirror', k === 'A' && state.settings.mirror); });
+  renderCard();
+}
+function renderCard(){
+  var s = state.session, t = cur(), col = $('cardcol'); col.innerHTML = '';
+  var sl = el('div','slate'); sl.appendChild(el('span','n', pad(t.n))); if (t.tag) sl.appendChild(el('span','tag' + (t.tag.indexOf('New') === 0 ? ' new' : ''), t.tag)); if (s.done[t.id]) sl.appendChild(el('span','tag','done'));
+  col.appendChild(sl);
+  col.appendChild(el('h2','tname', t.name));
+  if (t.pos){ var p = el('div'); p.appendChild(el('span','lbl','Position')); p.appendChild(el('p','ppos', t.pos)); col.appendChild(p); }
+  if (t.steps){ var d = el('div'); d.appendChild(el('span','lbl','Do')); var ol = el('ol','steps'); t.steps.forEach(function(x){ ol.appendChild(el('li', null, x)); }); d.appendChild(ol); col.appendChild(d); }
+  if (t.stop) col.appendChild(el('p','stop', t.stop));
+  if (t.demo){ var a = el('a', 'small', t.demo.label); a.href = t.demo.href; a.target = '_blank'; a.rel = 'noopener'; col.appendChild(a); }
+
+  var ctl = el('div','ctl');
+  if (canStart(t)){
+    var b = el('button', 'startbtn ' + (run ? 'danger' : 'primary'), run ? (run.phase === 'countdown' ? 'Cancel' : run.phase === 'saving' ? 'Saving…' : 'Stop') : ((s.clips[t.id] || []).length ? 'Record again' : (t.film !== false && anyCam() ? 'Start recording' : 'Start timer')));
+    b.type = 'button'; b.disabled = !!(run && run.phase === 'saving'); b.addEventListener('click', function(){ run ? stopTest() : startTest(); });
+    ctl.appendChild(b);
+    if (t.film !== false && anyCam() && !sessDir) ctl.appendChild(el('span','msg','No folder chosen, so clips won\'t be saved.'));
+  }
+  col.appendChild(ctl);
+  var st = el('p','status ' + (lastStatus.bad ? 'msg' : 'muted'), lastStatus.text); st.id = 'status'; col.appendChild(st);
+  var clips = (s.clips[t.id] || []);
+  if (clips.length) col.appendChild(el('p','small muted mono', 'Saved: ' + clips.join(', ')));
+
+  var fs = el('div','fields');
+  t.fields.forEach(function(f){
+    var r = el('div','field');
+    if (f.type === 'num' || f.type === 'text'){
+      var lb = el('label','fl', f.label); lb.htmlFor = 'f-' + f.id; r.appendChild(lb);
+      var inp = el('input'); inp.type = f.type === 'num' ? 'number' : 'text'; inp.id = 'f-' + f.id; if (f.type === 'num'){ inp.inputMode = 'decimal'; inp.min = '0'; }
+      inp.value = s.values[f.id] != null ? s.values[f.id] : '';
+      inp.addEventListener('input', function(){ s.values[f.id] = inp.value; save(); });
+      inp.addEventListener('change', writeResults);
+      inp.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); saveNext(); } });
+      r.appendChild(inp); if (f.unit) r.appendChild(el('span','muted small', f.unit));
+    } else if (f.type === 'sel'){
+      r.appendChild(el('span','fl', f.label)); var ch = el('div','chips');
+      f.options.forEach(function(o){ var c = el('button','chip', o); c.type = 'button'; c.setAttribute('aria-pressed', s.values[f.id] === o ? 'true' : 'false');
+        c.addEventListener('click', function(){ s.values[f.id] = (s.values[f.id] === o) ? '' : o; save(); writeResults(); renderCard(); }); ch.appendChild(c); });
+      r.appendChild(ch);
+    } else {
+      var c2 = el('button','chip', f.label); c2.type = 'button'; c2.setAttribute('aria-pressed', s.values[f.id] ? 'true' : 'false');
+      c2.addEventListener('click', function(){ s.values[f.id] = s.values[f.id] ? '' : 1; save(); writeResults(); renderCard(); }); r.appendChild(c2);
+    }
+    fs.appendChild(r);
+  });
+  if (t.beighton){ var bb = beighton(); fs.appendChild(el('p','mono small', 'Score: ' + bb.n + ' of 9. Five or more is the usual adult cut-off. A screen, not a diagnosis.')); }
+  var nr = el('div','field'); var nl = el('label','fl','Note'); nl.htmlFor = 'f-note'; nr.appendChild(nl);
+  var ni = el('input'); ni.type = 'text'; ni.id = 'f-note'; ni.placeholder = 'Optional: pain, an urge to wee, left vs right…'; ni.value = s.notes[t.id] || '';
+  ni.addEventListener('input', function(){ s.notes[t.id] = ni.value; save(); }); ni.addEventListener('change', writeResults);
+  ni.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); saveNext(); } });
+  nr.appendChild(ni); fs.appendChild(nr);
+  col.appendChild(fs);
+
+  var nav = el('div','navrow');
+  var back = el('button', null, 'Back'); back.type = 'button'; back.disabled = !!run || s.idx === 0; back.addEventListener('click', prev);
+  var next = el('button','primary next', s.idx === s.picked.length - 1 ? 'Save and finish' : 'Save and next'); next.type = 'button'; next.disabled = !!run; next.addEventListener('click', saveNext);
+  nav.appendChild(back); nav.appendChild(next); col.appendChild(nav);
+  var k = el('p','keys'); k.innerHTML = '<kbd>Space</kbd> start / stop &nbsp; <kbd>→</kbd> save and next &nbsp; <kbd>←</kbd> back &nbsp; A presenter clicker works too.';
+  col.appendChild(k);
+}
+function showEnd(){
+  var s = state.session; s.finished = new Date().toISOString(); save(); writeResults();
+  var col = $('cardcol'); col.innerHTML = '';
+  col.appendChild(el('h2','tname','Session saved'));
+  col.appendChild(el('p', null, sessDir ? 'Everything is in the folder "' + s.name + '". Tell Claude it\'s done: it can read the results straight from the folder.' : 'No folder was chosen, so copy the results below and paste them to Claude.'));
+  var ta = el('textarea','out'); ta.readOnly = true; ta.value = buildText(); col.appendChild(ta);
+  var row = el('div','navrow');
+  var cp = el('button','primary','Copy results'); cp.type = 'button';
+  cp.addEventListener('click', function(){ navigator.clipboard.writeText(ta.value).then(function(){ cp.textContent = 'Copied'; }, function(){ ta.select(); }); });
+  var bk = el('button', null, 'Back to the tests'); bk.type = 'button'; bk.addEventListener('click', function(){ delete s.finished; save(); renderSession(); });
+  var nw = el('button', null, 'Close session'); nw.type = 'button'; nw.addEventListener('click', function(){ state.session = null; save(); toSetup(); });
+  row.appendChild(cp); row.appendChild(bk); row.appendChild(nw); col.appendChild(row);
+}
+
+/* ---------------- screens ---------------- */
+var wakeLock = null;
+async function enterSession(){
+  $('setup').hidden = true; $('session').hidden = false;
+  try{ if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
+  if (state.session.finished) showEndFromState(); else renderSession();
+}
+function showEndFromState(){ renderSession(); showEnd(); }
+function toSetup(){
+  if (run) return;
+  $('session').hidden = true; $('setup').hidden = false;
+  ['A','B'].forEach(function(k){ var c = cams[k]; if (c.cv.parentNode !== c.pv) c.pv.insertBefore(c.cv, c.pv.firstChild); c.cv.classList.toggle('mirror', k === 'A' && state.settings.mirror); });
+  renderResume();
+}
+function renderResume(){
+  var s = state.session, card = $('resumeCard');
+  if (!s){ card.hidden = true; return; }
+  var done = s.picked.filter(function(id){ return s.done[id]; }).length;
+  $('resumeText').textContent = s.name + ': ' + done + ' of ' + s.picked.length + ' tests done. Resuming keeps saving into the same subfolder.';
+  card.hidden = false;
+}
+async function openSessionDir(create){
+  if (!rootDir){ $('startMsg').textContent = 'Choose a folder first (step 2).'; return false; }
+  if (!(await permitted(rootDir))){ $('startMsg').textContent = 'Chrome needs permission to save into the folder. Press Start again and allow it.'; return false; }
+  sessDir = await rootDir.getDirectoryHandle(state.session.name, {create:true});
+  return true;
+}
+async function startSession(){
+  $('startMsg').textContent = '';
+  var picked = TESTS.filter(function(t){ var c = document.querySelector('#testList input[value="'+t.id+'"]'); return c && c.checked; }).map(function(t){ return t.id; });
+  if (!picked.length){ $('startMsg').textContent = 'Tick at least one test.'; return; }
+  var needsFolder = picked.some(function(id){ return BYID[id].film !== false; }) && anyCam();
+  state.session = {name: nowStamp() + ' session', started: new Date().toISOString(), picked: picked, idx:0, values:{}, done:{}, notes:{}, takes:{}, clips:{}, stills:{}, dur:{}, cams:{A:camDesc('A'), B:camDesc('B')}};
+  if (needsFolder){ if (!(await openSessionDir(true))){ state.session = null; return; } }
+  else if (rootDir && await permitted(rootDir)){ sessDir = await rootDir.getDirectoryHandle(state.session.name, {create:true}); }
+  save(); writeResults(); enterSession();
+}
+async function resumeSession(){
+  $('startMsg').textContent = '';
+  if (rootDir && (await openSessionDir(false))){ state.session.cams = {A:camDesc('A'), B:camDesc('B')}; save(); enterSession(); }
+  else if (!rootDir){ $('startMsg').textContent = 'Choose the same folder first (step 2), then press Resume.'; }
+}
+
+/* ---------------- keyboard ---------------- */
+document.addEventListener('keydown', function(e){
+  if ($('session').hidden || !state.session || state.session.finished) return;
+  var tag = (document.activeElement && document.activeElement.tagName) || '';
+  var typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  if (e.key === 'Escape' && typing){ document.activeElement.blur(); return; }
+  if (typing) return;
+  if (e.key === ' ' || e.key === 'PageDown' || e.key === 'b' || e.key === 'B'){ e.preventDefault(); if (run) stopTest(); else startTest(); }
+  else if (e.key === 'ArrowRight'){ e.preventDefault(); saveNext(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); prev(); }
+});
+
+/* ---------------- wiring ---------------- */
+$('allowBtn').addEventListener('click', allowCams);
+['A','B'].forEach(function(k){
+  cams[k].sel.addEventListener('change', function(){ startCam(k); });
+  cams[k].rot.value = String(state.settings.rot[k] || 0);
+  cams[k].rot.addEventListener('change', function(){ state.settings.rot[k] = Number(cams[k].rot.value); save(); });
+});
+$('folderBtn').addEventListener('click', async function(){
+  $('folderMsg').textContent = '';
+  if (!window.showDirectoryPicker){ $('folderMsg').textContent = 'This browser can\'t save into a folder. Open the page in Chrome.'; return; }
+  try{ rootDir = await window.showDirectoryPicker({id:'movement-lab', mode:'readwrite'}); await kvSet('root', rootDir); $('folderName').textContent = rootDir.name; }
+  catch(e){ if (e.name !== 'AbortError') $('folderMsg').textContent = 'Could not open the folder: ' + e.message; }
+});
+$('cdSel').value = String(state.settings.countdown); $('cdSel').addEventListener('change', function(){ state.settings.countdown = Number($('cdSel').value); save(); });
+$('voiceChk').checked = !!state.settings.voice; $('voiceChk').addEventListener('change', function(){ state.settings.voice = $('voiceChk').checked; save(); if (state.settings.voice) say('Voice cues on', true); });
+$('mirrorChk').checked = !!state.settings.mirror; $('mirrorChk').addEventListener('change', function(){ state.settings.mirror = $('mirrorChk').checked; save(); cams.A.cv.classList.toggle('mirror', state.settings.mirror); });
+$('startBtn').addEventListener('click', startSession);
+$('resumeBtn').addEventListener('click', resumeSession);
+$('discardBtn').addEventListener('click', function(){ state.session = null; save(); renderResume(); });
+$('jump').addEventListener('change', function(){ if (run){ $('jump').value = state.session.idx; return; } state.session.idx = Number($('jump').value); save(); renderSession(); });
+$('toSetup').addEventListener('click', toSetup);
+$('endBtn').addEventListener('click', function(){ if (!run) showEnd(); });
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange', function(){ if (devList.length) listCams(); });
+
+(async function init(){
+  try{ await loadTests(); }catch(e){ document.body.innerHTML = '<p style="padding:24px">Could not load the test list (tests.json): ' + e.message + '</p>'; return; }
+  renderPresets(); renderTestList();
+  cams.A.cv.classList.toggle('mirror', state.settings.mirror);
+  var h = await kvGet('root'); if (h){ rootDir = h; $('folderName').textContent = h.name + ' (Chrome may ask to allow it again)'; }
+  renderResume();
+  // If camera access was already granted on this site, start the cameras straight away.
+  try{ var p = navigator.permissions && await navigator.permissions.query({name:'camera'}); if (p && p.state === 'granted') allowCams(); }catch(e){}
+  requestAnimationFrame(frame);
+})();
+})();
+</script>
+</body>
+</html>

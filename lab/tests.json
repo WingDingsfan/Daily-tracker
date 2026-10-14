@@ -1,0 +1,854 @@
+{
+ "version": 1,
+ "updated": "2026-10-14",
+ "coreOrder": [
+  "s1",
+  "s2a",
+  "s2b",
+  "s3a",
+  "s3b",
+  "s4",
+  "s5a",
+  "s5b",
+  "s6a",
+  "s6b",
+  "s7",
+  "s8a",
+  "s8b",
+  "s9",
+  "s10",
+  "s11",
+  "s12"
+ ],
+ "presets": [
+  {
+   "id": "all",
+   "label": "Full battery (everything)",
+   "tests": "all"
+  },
+  {
+   "id": "core",
+   "label": "Core 12 only",
+   "tests": [
+    "session",
+    "s10",
+    "post",
+    "s1",
+    "s2a",
+    "s2b",
+    "s3a",
+    "s3b",
+    "s12",
+    "s11",
+    "s4",
+    "s5a",
+    "s5b",
+    "s6a",
+    "s6b",
+    "s9",
+    "s8a",
+    "s8b",
+    "s7"
+   ]
+  },
+  {
+   "id": "finish",
+   "label": "Finish the 7 Oct baseline (split squats + wall sit)",
+   "tests": [
+    "session",
+    "s8a",
+    "s8b",
+    "s7"
+   ]
+  }
+ ],
+ "blocks": [
+  {
+   "title": "Before you start",
+   "sub": "No filming",
+   "tests": [
+    {
+     "id": "session",
+     "name": "Session details",
+     "film": false,
+     "pos": "At the laptop.",
+     "steps": [
+      "Type when you last took Ritalin and when you last had coffee.",
+      "Then press Save and next."
+     ],
+     "fields": [
+      {
+       "id": "ritalin",
+       "label": "Last Ritalin",
+       "type": "text",
+       "unit": "time and dose"
+      },
+      {
+       "id": "coffee",
+       "label": "Last coffee",
+       "type": "text",
+       "unit": "time"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Calm and posture",
+   "sub": "Seated, then standing",
+   "tests": [
+    {
+     "id": "s10",
+     "tag": "SIA 10",
+     "name": "Breaths per minute",
+     "film": false,
+     "pos": "Chair on the X, facing FRONT. Sit back in the seat, feet flat, hands resting on your thighs.",
+     "steps": [
+      "Press Start. The app talks you through it.",
+      "For the first minute, just sit and breathe through your nose the way you normally do.",
+      "When the app says 'start counting', count each breath out.",
+      "When it says 'stop counting', remember the number."
+     ],
+     "stop": "Don't slow your breathing down on purpose. I want your normal rate.",
+     "cues": [
+      {
+       "t": 0,
+       "say": "Sit and breathe normally"
+      },
+      {
+       "t": 60,
+       "say": "Start counting now"
+      },
+      {
+       "t": 120,
+       "say": "Stop counting"
+      }
+     ],
+     "autoStop": 121,
+     "fields": [
+      {
+       "id": "s10",
+       "label": "Breaths",
+       "type": "num",
+       "unit": "in the counted minute",
+       "core": "10. Breaths per minute, seated calm"
+      }
+     ]
+    },
+    {
+     "id": "post",
+     "tag": "New",
+     "name": "Posture stills",
+     "pos": "On the X, arms hanging, eyes on something at eye height. Your ears and the base of your neck need to be visible.",
+     "steps": [
+      "Press Start, walk to the X and march on the spot for five steps. Stop, and leave your feet where they land.",
+      "Face FRONT until the app says 'turn'.",
+      "Each time it says 'turn', make a quarter-turn to your right.",
+      "The app stops by itself after the fourth view."
+     ],
+     "stop": "Don't straighten up, pull your stomach in or fix your feet. Stand the way you would waiting for the kettle. The app saves a still from each view.",
+     "cues": [
+      {
+       "t": 0,
+       "say": "Face front and stand naturally"
+      },
+      {
+       "t": 10,
+       "say": "Turn"
+      },
+      {
+       "t": 20,
+       "say": "Turn"
+      },
+      {
+       "t": 30,
+       "say": "Turn"
+      },
+      {
+       "t": 40,
+       "say": "Done"
+      }
+     ],
+     "stills": [
+      6,
+      16,
+      26,
+      36
+     ],
+     "autoStop": 41,
+     "fields": []
+    },
+    {
+     "id": "head",
+     "tag": "New",
+     "name": "Head to wall",
+     "film": false,
+     "pos": "At the wall, in line with the X, back to the wall and facing SIDE. Heels about two finger-widths out from the wall, feet hip width.",
+     "steps": [
+      "Let your bottom and both shoulder blades rest on the wall.",
+      "Look straight ahead at eye height. Keep your chin level.",
+      "Let your head sit where it naturally sits. Don't push it back to reach the wall.",
+      "Slide flat fingers between the back of your skull and the wall. Count how many fit."
+     ],
+     "stop": "Zero if your head already touches. No filming needed: the finger count is the result.",
+     "fields": [
+      {
+       "id": "head",
+       "label": "Gap",
+       "type": "num",
+       "unit": "fingers (0 = touching)",
+       "extra": "Head to wall gap"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Mobility screens",
+   "sub": "Easy range only",
+   "tests": [
+    {
+     "id": "bei",
+     "tag": "New · once only",
+     "name": "Hypermobility screen (Beighton)",
+     "beighton": true,
+     "pos": "Walk up close to FRONT for the two hand tests. Go back to the X for elbows, knees and the fold. Hold each one still for 3 seconds.",
+     "steps": [
+      "Little finger: forearm and palm flat on a table, palm down. With the other hand, lift the little finger back toward your wrist. It scores if it goes past pointing straight up. Both hands.",
+      "Thumb: bend your wrist forward. With the other hand, press the thumb toward the inside of the same forearm. It scores if it touches. Both hands.",
+      "Elbow: facing FRONT, hold one arm straight out to the side at shoulder height, palm up, and straighten fully. It scores if the forearm clearly dips below a straight line. Both arms.",
+      "Knee: on the X, facing FRONT. Press both knees back as far as they go. It scores if the knee bows backward past straight.",
+      "Palms to floor: feet together, knees straight, fold forward. It scores if both palms rest flat on the floor."
+     ],
+     "stop": "Never force a joint. If you're unsure about elbows or knees, leave them unticked and I'll judge from the footage.",
+     "demo": {
+      "href": "https://www.ehlers-danlos.com/assessing-joint-hypermobility/",
+      "label": "Pictures of each test"
+     },
+     "fields": [
+      {
+       "id": "b1",
+       "label": "Little finger past 90°, left",
+       "type": "chk"
+      },
+      {
+       "id": "b2",
+       "label": "Little finger past 90°, right",
+       "type": "chk"
+      },
+      {
+       "id": "b3",
+       "label": "Thumb touches forearm, left",
+       "type": "chk"
+      },
+      {
+       "id": "b4",
+       "label": "Thumb touches forearm, right",
+       "type": "chk"
+      },
+      {
+       "id": "b5",
+       "label": "Elbow bends back past straight, left",
+       "type": "chk"
+      },
+      {
+       "id": "b6",
+       "label": "Elbow bends back past straight, right",
+       "type": "chk"
+      },
+      {
+       "id": "b7",
+       "label": "Knee bends back past straight, left",
+       "type": "chk"
+      },
+      {
+       "id": "b8",
+       "label": "Knee bends back past straight, right",
+       "type": "chk"
+      },
+      {
+       "id": "b9",
+       "label": "Palms flat on the floor, knees straight",
+       "type": "chk"
+      }
+     ]
+    },
+    {
+     "id": "fold",
+     "tag": "New",
+     "name": "Forward fold",
+     "pos": "On the X, facing FRONT, so SIDE sees your profile. Feet together, knees straight but not jammed back.",
+     "steps": [
+      "Breathe out and roll down slowly from your head, letting your arms hang.",
+      "Reach toward the floor. No bouncing.",
+      "Hold the lowest easy point for 5 seconds, then roll up slowly."
+     ],
+     "stop": "Record how far your fingertips reached.",
+     "stills": [
+      8
+     ],
+     "fields": [
+      {
+       "id": "fold",
+       "label": "Reach",
+       "type": "sel",
+       "options": [
+        "Palms flat",
+        "Fingertips touch",
+        "Ankles",
+        "Shins",
+        "Knees"
+       ],
+       "extra": "Forward fold reach"
+      }
+     ]
+    },
+    {
+     "id": "hipir",
+     "tag": "New",
+     "name": "Seated hip rotation",
+     "pos": "Chair on the X, facing FRONT. Sit on the front half of the seat, tall, feet flat, knees a fist apart and pointing at the camera. Hold the sides of the seat.",
+     "steps": [
+      "Keep your left knee pointing at the camera and the thigh still.",
+      "Swing your left foot out to the left, like a windscreen wiper hinged at the knee.",
+      "Go as far as it goes without your left buttock lifting or your body leaning. Hold 3 seconds, bring it back.",
+      "Same with the right foot, swinging out to the right."
+     ],
+     "stop": "I measure the shin angle from FRONT. You record which side went less far.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=seated+hip+internal+rotation+range+of+motion+test",
+      "label": "Search YouTube for a demo"
+     },
+     "fields": [
+      {
+       "id": "hipir",
+       "label": "Stiffer side",
+       "type": "sel",
+       "options": [
+        "Left",
+        "Right",
+        "Same"
+       ],
+       "extra": "Seated hip rotation, stiffer side"
+      }
+     ]
+    },
+    {
+     "id": "s1",
+     "tag": "SIA 1",
+     "name": "Deep squat hold",
+     "pos": "On the X, facing FRONT, chair within reach. Feet a little wider than your shoulders, toes turned out a bit. The left foot can turn out more.",
+     "steps": [
+      "Arms straight out in front for balance.",
+      "On 'go', sit down and back between your heels as low as you can with both heels flat.",
+      "At the bottom, knees over toes, chest as tall as is comfortable.",
+      "Breathe into your belly and let the pelvic floor drop on each in-breath. The app counts every 10 seconds and calls time at 60."
+     ],
+     "stop": "Stop at 60, when a heel lifts, at any knee, ankle or hip pain, or when you notice you're holding your breath. If you can't get lower than thighs-level, hold your lowest heels-down position and type 'half depth' in the note.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=deep+squat+hold+heels+down",
+      "label": "Search YouTube for a demo"
+     },
+     "every": 10,
+     "max": 60,
+     "stills": [
+      8
+     ],
+     "fields": [
+      {
+       "id": "s1",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec (max 60)",
+       "core": "1. Deep squat hold (sec)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Balance",
+   "sub": "Chair within reach",
+   "tests": [
+    {
+     "id": "s2a",
+     "tag": "SIA 2a",
+     "name": "One-leg stand, eyes open: LEFT",
+     "pos": "On the X, facing FRONT, hands on hips, chair within arm's reach. Standing on your LEFT leg.",
+     "steps": [
+      "Pick a spot at eye height to look at.",
+      "On 'go', bend your right knee so that foot comes about 15 cm off the floor. Don't rest it against the standing leg.",
+      "Keep the standing knee soft, not locked."
+     ],
+     "stop": "The clock stops when the lifted foot touches down, the standing foot hops or shifts, the lifted leg touches the standing leg, or a hand leaves your hips. One restart allowed if you fall out in the first 3 seconds. The app calls time at 60.",
+     "every": 10,
+     "max": 60,
+     "stills": [
+      5
+     ],
+     "fields": [
+      {
+       "id": "s2a",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec (max 60)",
+       "core": "2a. One-leg stand, eyes open, LEFT (sec)"
+      }
+     ]
+    },
+    {
+     "id": "s2b",
+     "tag": "SIA 2b",
+     "name": "One-leg stand, eyes open: RIGHT",
+     "pos": "Same position, standing on your RIGHT leg.",
+     "steps": [
+      "Pick a spot at eye height.",
+      "On 'go', lift your left foot about 15 cm off the floor.",
+      "Standing knee soft, not locked."
+     ],
+     "stop": "The clock stops when the lifted foot touches down, the standing foot hops or shifts, the lifted leg touches the standing leg, or a hand leaves your hips. One restart allowed if you fall out in the first 3 seconds. The app calls time at 60.",
+     "every": 10,
+     "max": 60,
+     "stills": [
+      5
+     ],
+     "fields": [
+      {
+       "id": "s2b",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec (max 60)",
+       "core": "2b. One-leg stand, eyes open, RIGHT (sec)"
+      }
+     ]
+    },
+    {
+     "id": "s3a",
+     "tag": "SIA 3a",
+     "name": "One-leg stand, eyes closed: LEFT",
+     "pos": "On the X, hands on hips, chair close. Standing on your LEFT leg.",
+     "steps": [
+      "Get balanced on your left leg with your eyes open.",
+      "On 'go', close your eyes."
+     ],
+     "stop": "Same stop rules, plus when your eyes open. The app calls time at 30. Short times are normal here.",
+     "every": 10,
+     "max": 30,
+     "fields": [
+      {
+       "id": "s3a",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec (max 30)",
+       "core": "3a. One-leg stand, eyes closed, LEFT (sec)"
+      }
+     ]
+    },
+    {
+     "id": "s3b",
+     "tag": "SIA 3b",
+     "name": "One-leg stand, eyes closed: RIGHT",
+     "pos": "Same, standing on your RIGHT leg.",
+     "steps": [
+      "Get balanced on your right leg with your eyes open.",
+      "On 'go', close your eyes."
+     ],
+     "stop": "Same stop rules, plus when your eyes open. The app calls time at 30.",
+     "every": 10,
+     "max": 30,
+     "fields": [
+      {
+       "id": "s3b",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec (max 30)",
+       "core": "3b. One-leg stand, eyes closed, RIGHT (sec)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Floor",
+   "sub": "Feet toward FRONT",
+   "tests": [
+    {
+     "id": "kd",
+     "tag": "New",
+     "name": "Knee-drop rotation",
+     "pos": "Lie on your back along the mat, centred on the X, feet toward FRONT. Arms out to the sides at shoulder height, palms up. Knees bent, feet flat, feet and knees pressed together.",
+     "steps": [
+      "Keeping knees and ankles glued together, lower both knees slowly to the left.",
+      "Hips and lower back roll with them. Head stays in the middle.",
+      "Stop when the knees reach the floor, start to slide apart, or your right shoulder blade peels up.",
+      "Pause 2 seconds, back to the middle, then to the right."
+     ],
+     "stop": "Clean means the knees got to the floor or close, stayed together, and the opposite shoulder blade stayed down.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=supine+lower+trunk+rotation+knees+together",
+      "label": "Search YouTube for a demo"
+     },
+     "fields": [
+      {
+       "id": "kdl",
+       "label": "To the left",
+       "type": "sel",
+       "options": [
+        "Clean",
+        "Knees came apart",
+        "Shoulder lifted"
+       ],
+       "extra": "Knee-drop to the left"
+      },
+      {
+       "id": "kdr",
+       "label": "To the right",
+       "type": "sel",
+       "options": [
+        "Clean",
+        "Knees came apart",
+        "Shoulder lifted"
+       ],
+       "extra": "Knee-drop to the right"
+      }
+     ]
+    },
+    {
+     "id": "s11",
+     "tag": "SIA 11",
+     "name": "Pelvic floor drop on command",
+     "film": false,
+     "pos": "On your back, knees bent, feet flat and hip width, hands on your lower belly.",
+     "steps": [
+      "Breathe in slowly through your nose so your belly and lower ribs widen.",
+      "As you breathe in, let the area between your sit bones soften and sink toward the mat, like the release that starts a wee. Don't push.",
+      "Breathe out and let it come back by itself. No squeezing.",
+      "Five breaths, then rate it."
+     ],
+     "stop": "0 = nothing changes. 10 = a clear, easy drop every breath. If you can't find it, squeeze gently for 2 seconds, then let go: the letting-go is what you're rating.",
+     "fields": [
+      {
+       "id": "s11",
+       "label": "Self-rating",
+       "type": "num",
+       "unit": "0–10",
+       "core": "11. Pelvic floor drop-on-command (0–10)"
+      }
+     ]
+    },
+    {
+     "id": "s12",
+     "tag": "SIA 12",
+     "name": "Happy baby comfort",
+     "pos": "On your back, centred on the X. Bring both knees toward your armpits, wider than your chest, shins upright, soles facing the ceiling.",
+     "steps": [
+      "Hold the outside edges of your feet, or your shins, or behind your knees.",
+      "Tailbone heavy on the mat, head and shoulders down.",
+      "Five slow breaths, then rate it."
+     ],
+     "stop": "0 = can't get into it, or it hurts. 10 = you could stay for minutes.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=happy+baby+pose",
+      "label": "Search YouTube for a demo"
+     },
+     "stills": [
+      10
+     ],
+     "fields": [
+      {
+       "id": "s12",
+       "label": "Self-rating",
+       "type": "num",
+       "unit": "0–10",
+       "core": "12. Happy baby comfort (0–10)"
+      }
+     ]
+    },
+    {
+     "id": "s4",
+     "tag": "SIA 4",
+     "name": "Glute bridge hold",
+     "pos": "On your back, centred on the X, feet toward FRONT. Knees bent, feet flat and hip width, heels about a hand-length from your bottom. Arms by your sides.",
+     "steps": [
+      "On 'go', press through your heels and lift until shoulders, hips and knees make one straight line. No higher.",
+      "Weight on your shoulder blades, not your neck.",
+      "Glutes work, back passage soft, keep breathing. The app calls time at 60."
+     ],
+     "stop": "Stop at 60, when your hips sag below the line, at a hamstring cramp, or when your lower back takes over.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=glute+bridge+hold+form",
+      "label": "Search YouTube for a demo"
+     },
+     "every": 10,
+     "max": 60,
+     "stills": [
+      8
+     ],
+     "fields": [
+      {
+       "id": "s4",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec (max 60)",
+       "core": "4. Glute bridge hold (sec)"
+      }
+     ]
+    },
+    {
+     "id": "s5a",
+     "tag": "SIA 5a",
+     "name": "Single-leg bridge reps: LEFT foot down",
+     "pos": "Same start as the bridge hold. Your LEFT foot stays on the floor.",
+     "steps": [
+      "Lift your right foot and straighten that knee, thigh alongside the left.",
+      "Press through your left heel and lift to the straight line.",
+      "Keep both hip bones level.",
+      "Lower until your bottom brushes the mat. About 2 seconds up, 2 down. Count out loud."
+     ],
+     "stop": "Stop at 15, when you can't reach the line, when your pelvis tilts or twists, or at a cramp.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=single+leg+glute+bridge+form",
+      "label": "Search YouTube for a demo"
+     },
+     "fields": [
+      {
+       "id": "s5a",
+       "label": "Reps",
+       "type": "num",
+       "unit": "max 15",
+       "core": "5a. Single-leg bridge reps, LEFT"
+      }
+     ]
+    },
+    {
+     "id": "s5b",
+     "tag": "SIA 5b",
+     "name": "Single-leg bridge reps: RIGHT foot down",
+     "pos": "Same start. Your RIGHT foot stays on the floor. Rest a minute after the left side first.",
+     "steps": [
+      "Lift your left foot and straighten that knee.",
+      "Press through your right heel and lift to the straight line.",
+      "Keep both hip bones level.",
+      "Lower until your bottom brushes the mat. Count out loud."
+     ],
+     "stop": "Stop at 15, when you can't reach the line, when your pelvis tilts or twists, or at a cramp.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=single+leg+glute+bridge+form",
+      "label": "Search YouTube for a demo"
+     },
+     "fields": [
+      {
+       "id": "s5b",
+       "label": "Reps",
+       "type": "num",
+       "unit": "max 15",
+       "core": "5b. Single-leg bridge reps, RIGHT"
+      }
+     ]
+    },
+    {
+     "id": "s6a",
+     "tag": "SIA 6a",
+     "name": "Side plank: LEFT elbow down",
+     "pos": "Lie on your left side along the mat, chest facing SIDE, centred on the X.",
+     "steps": [
+      "Left elbow directly under your shoulder, forearm pointing forward.",
+      "Legs straight, feet stacked. If stacking hurts, top foot in front, and note it.",
+      "On 'go', lift your hips into one straight line from ankles to ears. Top hand on your hip.",
+      "Keep breathing. The app counts every 10 seconds."
+     ],
+     "stop": "Stop the second time your hips sag, or at any shoulder pain.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=forearm+side+plank+form",
+      "label": "Search YouTube for a demo"
+     },
+     "every": 10,
+     "stills": [
+      6
+     ],
+     "fields": [
+      {
+       "id": "s6a",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec",
+       "core": "6a. Side plank, LEFT (sec)"
+      }
+     ]
+    },
+    {
+     "id": "s6b",
+     "tag": "SIA 6b",
+     "name": "Side plank: RIGHT elbow down",
+     "pos": "Lie on your right side, swapping ends of the mat so your chest still faces SIDE. Rest a minute first.",
+     "steps": [
+      "Right elbow under your shoulder, forearm pointing forward.",
+      "Legs straight, feet stacked the same way as the left side.",
+      "On 'go', lift into one straight line. Top hand on your hip.",
+      "Keep breathing."
+     ],
+     "stop": "Stop the second time your hips sag, or at any shoulder pain.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=forearm+side+plank+form",
+      "label": "Search YouTube for a demo"
+     },
+     "every": 10,
+     "stills": [
+      6
+     ],
+     "fields": [
+      {
+       "id": "s6b",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec",
+       "core": "6b. Side plank, RIGHT (sec)"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Legs, last",
+   "sub": "Rest 60–90 sec between tests",
+   "tests": [
+    {
+     "id": "s9",
+     "tag": "SIA 9",
+     "name": "Sit-to-stands in 30 seconds",
+     "pos": "Chair on the X, on the mat, facing FRONT. Sit in the middle of the seat, feet flat and shoulder width, heels slightly behind your knees. Arms crossed, hands on opposite shoulders.",
+     "steps": [
+      "On 'go', stand fully, hips and knees straight.",
+      "Sit back down until your bottom touches the seat.",
+      "Count each full stand out loud.",
+      "The app says 'stop' at 30 seconds. If you're more than halfway up then, count it."
+     ],
+     "stop": "No pushing off with your hands and no breath-holding.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=30+second+chair+stand+test",
+      "label": "Search YouTube for a demo"
+     },
+     "cues": [
+      {
+       "t": 0,
+       "say": "Go"
+      },
+      {
+       "t": 10,
+       "say": "Ten"
+      },
+      {
+       "t": 20,
+       "say": "Twenty"
+      },
+      {
+       "t": 30,
+       "say": "Stop"
+      }
+     ],
+     "autoStop": 32,
+     "stills": [
+      5
+     ],
+     "fields": [
+      {
+       "id": "s9",
+       "label": "Stands",
+       "type": "num",
+       "unit": "in 30 sec",
+       "core": "9. Sit-to-stands in 30 sec"
+      }
+     ]
+    },
+    {
+     "id": "s8a",
+     "tag": "SIA 8a",
+     "name": "Bulgarian split squat reps: LEFT leg forward",
+     "pos": "Second chair on the mat behind you. Stand on the X facing FRONT, about two of your foot-lengths in front of the seat, hands on hips. LEFT leg is the front, working leg.",
+     "steps": [
+      "Rest the top of your right foot on the seat behind you, laces down.",
+      "Lower straight down by bending the front knee until the front thigh is about level or the back knee is just off the floor.",
+      "Front foot flat, front knee in line with your second toe.",
+      "Push through the front foot to stand. About 2 seconds down, 1 up. Count out loud."
+     ],
+     "stop": "Stop at 12, when the front heel lifts, when the knee caves in, or after grabbing for balance twice. The left may not go as deep. That's the ankle.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=bulgarian+split+squat+bodyweight+form",
+      "label": "Search YouTube for a demo"
+     },
+     "stills": [
+      5
+     ],
+     "fields": [
+      {
+       "id": "s8a",
+       "label": "Reps",
+       "type": "num",
+       "unit": "max 12",
+       "core": "8a. Bulgarian split squat reps, LEFT fwd"
+      }
+     ]
+    },
+    {
+     "id": "s8b",
+     "tag": "SIA 8b",
+     "name": "Bulgarian split squat reps: RIGHT leg forward",
+     "pos": "Same setup with the RIGHT leg in front. Rest a minute after the left side.",
+     "steps": [
+      "Rest the top of your left foot on the seat behind you.",
+      "Lower straight down until the front thigh is about level.",
+      "Front foot flat, knee in line with your second toe.",
+      "Push up through the front foot. Count out loud."
+     ],
+     "stop": "Stop at 12, when the front heel lifts, when the knee caves in, or after grabbing for balance twice.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=bulgarian+split+squat+bodyweight+form",
+      "label": "Search YouTube for a demo"
+     },
+     "stills": [
+      5
+     ],
+     "fields": [
+      {
+       "id": "s8b",
+       "label": "Reps",
+       "type": "num",
+       "unit": "max 12",
+       "core": "8b. Bulgarian split squat reps, RIGHT fwd"
+      }
+     ]
+    },
+    {
+     "id": "s7",
+     "tag": "SIA 7",
+     "name": "Wall sit",
+     "pos": "At the wall, in line with the X, back to the wall, facing SIDE. Feet hip width, about two of your foot-lengths out from the wall.",
+     "steps": [
+      "On 'go', slide down until your thighs are level and your knees are at 90°, above your ankles.",
+      "Whole back and head on the wall.",
+      "Arms crossed on your chest, hands off your thighs.",
+      "Keep breathing. The app counts every 10 seconds."
+     ],
+     "stop": "Stop when you slide up or down, when a hand goes to your thighs, or at knee pain.",
+     "demo": {
+      "href": "https://www.youtube.com/results?search_query=wall+sit+form",
+      "label": "Search YouTube for a demo"
+     },
+     "every": 10,
+     "stills": [
+      6
+     ],
+     "fields": [
+      {
+       "id": "s7",
+       "label": "Held",
+       "type": "num",
+       "unit": "sec",
+       "core": "7. Wall sit (sec)"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
